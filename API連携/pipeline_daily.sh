@@ -8,6 +8,11 @@ echo "（例：物価上昇で苦しむ40代サラリーマンの逆転戦略）
 read THEME
 echo ""
 
+echo "【米国株デイリーリサーチ実行中...】"
+python3 ~/Desktop/AI経営本部/API連携/daily_stock_research.py
+echo "✅ 米国株リサーチ完了"
+echo ""
+
 DATE=$(date +%Y%m%d)
 mkdir -p ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE
 
