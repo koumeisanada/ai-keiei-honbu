@@ -1,15 +1,56 @@
 #!/bin/bash
+# ログファイル設定（cron実行時の確認用）
+LOGDIR=~/Desktop/AI経営本部/集客販売/日次成果物
+DATE=$(date +%Y%m%d)
+LOGFILE="$LOGDIR/$DATE/pipeline.log"
+mkdir -p "$LOGDIR/$DATE"
+
+# 全出力をログにも記録
+exec > >(tee -a "$LOGFILE") 2>&1
+
 echo "================================================"
 echo "  真田孔明AI経営本部 デイリーパイプライン"
+echo "  実行時刻：$(date '+%Y-%m-%d %H:%M:%S')"
 echo "================================================"
 echo ""
-echo "今日のメルマガのテーマを入力してください："
-echo "（例：物価上昇で苦しむ40代サラリーマンの逆転戦略）"
-read THEME
+
+# --- テーマ取得 ---
+# 引数があればそれを使用、なければテーマファイル、なければデフォルト
+THEME_FILE=~/Desktop/AI経営本部/API連携/設定ファイル/tomorrow_theme.txt
+DEFAULT_THEME="今日の最新ニュースから40代サラリーマンに刺さるテーマを選んで"
+
+if [ -n "$1" ]; then
+    # 手動実行時：引数からテーマ取得
+    THEME="$1"
+    echo "テーマ（引数指定）：$THEME"
+elif [ -t 0 ]; then
+    # 対話モード：手動入力を受付
+    echo "今日のメルマガのテーマを入力してください："
+    echo "（例：物価上昇で苦しむ40代サラリーマンの逆転戦略）"
+    echo "（空Enterでテーマファイルを使用）"
+    read THEME
+    if [ -z "$THEME" ]; then
+        if [ -s "$THEME_FILE" ]; then
+            THEME=$(cat "$THEME_FILE")
+        else
+            THEME="$DEFAULT_THEME"
+        fi
+        echo "テーマ（ファイル/デフォルト）：$THEME"
+    fi
+else
+    # cron等の非対話モード：テーマファイル→デフォルトの順
+    if [ -s "$THEME_FILE" ]; then
+        THEME=$(cat "$THEME_FILE")
+        echo "テーマ（ファイルから取得）：$THEME"
+    else
+        THEME="$DEFAULT_THEME"
+        echo "テーマ（デフォルト）：$THEME"
+    fi
+fi
 echo ""
 
-DATE=$(date +%Y%m%d)
-mkdir -p ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE
+# テーマ使用後、ファイルをデフォルトにリセット
+echo "$DEFAULT_THEME" > "$THEME_FILE"
 
 echo "【前日の品質チェック結果を反映中...】"
 python3 ~/Desktop/AI経営本部/API連携/Gemini/apply_feedback.py
@@ -45,6 +86,26 @@ echo ""
 echo "【Step4】ストーリー画像プロンプトを生成中..."
 claude --print "以下のメルマガのテーマに合わせて、ゼータスタイルのInstagramストーリー画像プロンプトを1つ生成してください：$(cat ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt | head -c 500)" > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/ストーリー画像プロンプト.txt
 echo "✅ ストーリー画像プロンプト完了"
+echo ""
+
+echo "【競合分析実行中...（週1回）】"
+DAY_OF_WEEK=$(date +%u)
+if [ "$DAY_OF_WEEK" = "1" ]; then
+    python3 ~/Desktop/AI経営本部/競合調査/ai_competitor_research.py
+    echo "✅ 競合分析完了"
+else
+    echo "（競合分析は毎週月曜日に自動実行）"
+fi
+echo ""
+
+echo "【セールスレター制作 本日のタスク実行中...】"
+python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/daily_salesletter.py
+echo "✅ セールスレタータスク完了"
+echo ""
+
+echo "【グローバルAI講座調査実行中...】"
+python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/global_ai_research.py
+echo "✅ グローバル調査完了"
 echo ""
 
 echo "【Step5】品質チェック中...（Claude使用）"
