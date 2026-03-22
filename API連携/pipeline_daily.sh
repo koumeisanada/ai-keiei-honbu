@@ -99,6 +99,7 @@ fi
 echo ""
 
 echo "【セールスレター制作 本日のタスク実行中...】"
+echo "午前・午後の2回実行します"
 python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/daily_salesletter.py
 echo "✅ セールスレタータスク完了"
 echo ""
@@ -130,3 +131,7 @@ echo "1. ストーリー画像プロンプト.txtを開く"
 echo "2. Gemini（ナノバナナプロ）に貼り付けて画像生成"
 echo "3. 各媒体に投稿！"
 echo "================================================"
+
+echo ""
+echo "【本日のアウトプット確認レポート】"
+bash ~/Desktop/AI経営本部/API連携/check_progress.sh
