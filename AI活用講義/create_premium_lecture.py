@@ -10,9 +10,18 @@ from docx.oxml import OxmlElement
 from google import genai
 from google.genai import types
 import anthropic
+import openai
 
 # APIクライアント初期化
 gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
+# OpenAI・Anthropicはキーがある場合のみ初期化
+_openai_key = os.environ.get("OPENAI_API_KEY")
+_anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+if _openai_key:
+    openai_client = openai.OpenAI(api_key=_openai_key)
+if _anthropic_key:
+    claude_client = anthropic.Anthropic(api_key=_anthropic_key)
 claude_client = anthropic.Anthropic()
 
 SAVE_DIR = os.path.expanduser(
@@ -42,10 +51,22 @@ def generate_with_gemini(prompt):
     )
     return response.text
 
+def generate_with_chatgpt(prompt):
+    """ChatGPT：論理チェック・正確性確認に使用"""
+    if _openai_key:
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=4000
+        )
+        return response.choices[0].message.content
+    else:
+        print("  （OpenAI APIキー未設定→Geminiで論理チェック代替）")
+        return generate_with_gemini(prompt)
+
 def generate_with_claude(prompt):
-    """品質チェック・最終仕上げ（Anthropic APIキー未設定時はGeminiで代替）"""
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if api_key:
+    """Claude：修正・完成・最終仕上げに使用"""
+    if _anthropic_key:
         message = claude_client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=4000,
@@ -53,7 +74,7 @@ def generate_with_claude(prompt):
         )
         return message.content[0].text
     else:
-        print("  （Anthropic APIキー未設定→Geminiで品質チェック代替）")
+        print("  （Anthropic APIキー未設定→Geminiで最終仕上げ代替）")
         return generate_with_gemini(prompt)
 
 def step1_research(today):
@@ -123,24 +144,74 @@ def step2_structure(research_data, today):
 """
     return generate_with_gemini(prompt)
 
-def step3_quality_check(structured_content, today):
-    """Step3：Claudeで品質チェック・論理整合性・表現の改善"""
-    print("Step3：Claudeで品質チェック・論理整合性確認・表現改善中...")
+def step3_logic_check(structured_content, today):
+    """Step3：ChatGPTで論理チェック・正確性確認"""
+    print("Step3：ChatGPTで論理チェック・正確性確認中...")
 
     prompt = f"""
 以下は真田孔明のAI活用講座 第1回講義資料の草稿です。
 
 {structured_content[:5000]}
 
-以下の観点で品質チェックと改善を行ってください。
+あなたは「論理チェック担当AI」です。以下の観点で厳密にチェックしてください。
 
-1. 論理整合性（主張と根拠の一致）
-2. 受講生への配慮（Level 1でも理解できるか）
-3. 実用性（明日から実践できるか）
-4. 真田孔明らしさ（実体験・AI経営本部の実例）
-5. 表現の改善点
+【チェック項目】
+1. 論理整合性：主張と根拠が一致しているか。矛盾した記述がないか
+2. データの正確性：引用されている統計・数字は正確か。出典は信頼できるか
+3. 因果関係：「なぜなら」「つまり」の前後が論理的に繋がっているか
+4. 網羅性：重要な注意事項が漏れていないか
+5. 受講生視点：Level 1の初心者でも理解できる説明になっているか
 
-改善点のサマリーと改善後のコンテンツを出力してください。
+【出力形式】
+## 論理チェック結果
+
+### 問題なし（✅）の箇所
+（正確・論理的に整合している箇所を列挙）
+
+### 要修正（⚠️）の箇所
+各箇所について：
+・問題の内容
+・なぜ問題か
+・修正案
+
+### 追加すべき内容
+（漏れている重要な注意事項があれば）
+
+### 総合評価
+（100点満点で採点＋改善の優先順位）
+"""
+    return generate_with_chatgpt(prompt)
+
+def step4_final_revision(structured_content, logic_feedback, today):
+    """Step4：Claudeで修正・完成"""
+    print("Step4：Claudeで修正・最終完成中...")
+
+    prompt = f"""
+あなたは「最終仕上げ担当AI」です。
+
+【元の草稿】
+{structured_content[:3000]}
+
+【ChatGPTによる論理チェック結果】
+{logic_feedback[:2000]}
+
+上記のフィードバックを全て反映して、講義資料を修正・完成させてください。
+
+【修正ルール】
+1. ChatGPTが指摘した「要修正」箇所を全て修正する
+2. 「追加すべき内容」があれば適切な場所に追加する
+3. 真田孔明のAI経営本部の実体験を反映する
+4. 全ての主張に客観的な根拠・データを付ける
+5. 結論→根拠→事実→応用の順で書く
+6. 感情訴求は使わない
+7. Level 1の初心者でも理解できる表現にする
+
+【出力形式】
+## 修正サマリー
+（何を修正したかを箇条書きで）
+
+## 修正後の完成版コンテンツ
+（完成した講義資料の全文）
 """
     return generate_with_claude(prompt)
 
@@ -401,7 +472,17 @@ def main():
 
     print("=" * 60)
     print("最高品質講義資料制作システム起動")
-    print("3大AI横断活用：Gemini（検索）+ Gemini（生成）+ Claude（品質チェック）")
+    print("3大AI完全役割分担：")
+    print("  Step1: Gemini（検索）→ 最新情報・根拠データ収集")
+    print("  Step2: Gemini（生成）→ 講義資料の構造・内容生成")
+    print("  Step3: ChatGPT（論理チェック）→ 正確性・論理性確認")
+    print("  Step4: Claude（修正・完成）→ フィードバック反映・最終仕上げ")
+    print("  Step5: Word生成＋画像プロンプト")
+    ai_status = []
+    ai_status.append(f"  Gemini: {'✅ 有効' if os.environ.get('GEMINI_API_KEY') else '❌ 未設定'}")
+    ai_status.append(f"  ChatGPT: {'✅ 有効' if _openai_key else '⚠️ 未設定（Gemini代替）'}")
+    ai_status.append(f"  Claude: {'✅ 有効' if _anthropic_key else '⚠️ 未設定（Gemini代替）'}")
+    for s in ai_status: print(s)
     print("=" * 60)
 
     research_data = step1_research(today)
@@ -414,10 +495,15 @@ def main():
         f.write(f"# 草稿\n## {today}\n\n{structured_content}")
     print("✅ Step2完了：講義資料草稿生成")
 
-    final_content = step3_quality_check(structured_content, today)
-    with open(os.path.join(SAVE_DIR, "品質チェック済み.md"), "w") as f:
-        f.write(f"# 品質チェック済み\n## {today}\n\n{final_content}")
-    print("✅ Step3完了：Claude品質チェック・改善")
+    logic_feedback = step3_logic_check(structured_content, today)
+    with open(os.path.join(SAVE_DIR, "Step3_ChatGPT論理チェック.md"), "w") as f:
+        f.write(f"# ChatGPT論理チェック結果\n## {today}\n\n{logic_feedback}")
+    print("✅ Step3完了：ChatGPT論理チェック")
+
+    final_content = step4_final_revision(structured_content, logic_feedback, today)
+    with open(os.path.join(SAVE_DIR, "Step4_Claude修正完成版.md"), "w") as f:
+        f.write(f"# Claude修正完成版\n## {today}\n\n{final_content}")
+    print("✅ Step4完了：Claude修正・最終完成")
 
     word_file = create_word_document(final_content, [], today)
     print("✅ Step4完了：Wordファイル生成")
