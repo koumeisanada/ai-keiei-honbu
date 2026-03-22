@@ -167,6 +167,121 @@ A：
     print(f"✅ 後半パート保存完了")
     print(f"✅ 第{lecture_num}回 全資料完成：{save_dir}")
 
+    # Word版の生成
+    create_lecture_word(lecture_num, level_from, level_to,
+                        response1.text, response2.text, save_dir)
+
+
+def create_lecture_word(lecture_num, level_from, level_to,
+                        part1_text, part2_text, save_dir):
+    from docx import Document
+    from docx.shared import Pt, RGBColor, Inches
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+    doc = Document()
+
+    for section in doc.sections:
+        section.page_width = Inches(8.27)
+        section.page_height = Inches(11.69)
+        section.left_margin = Inches(1)
+        section.right_margin = Inches(1)
+
+    NAVY = RGBColor(0x1B, 0x4F, 0x72)
+
+    # 表紙
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run(f"第{lecture_num:02d}回 AI活用講義")
+    run.font.size = Pt(24)
+    run.font.bold = True
+    run.font.color.rgb = NAVY
+
+    p2 = doc.add_paragraph()
+    p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run2 = p2.add_run(f"Level {level_from}→{level_to} 実践カリキュラム")
+    run2.font.size = Pt(14)
+    run2.font.color.rgb = RGBColor(0x88, 0x87, 0x80)
+
+    p3 = doc.add_paragraph()
+    p3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run3 = p3.add_run(f"真田孔明 AI活用講座\n{datetime.now().strftime('%Y年%m月%d日')}")
+    run3.font.size = Pt(11)
+
+    doc.add_page_break()
+
+    # 前半パート
+    doc.add_heading("前半：AI最新情報＋初心者向け解説", level=1)
+    doc.add_paragraph("[画像挿入箇所：今月のAI業界トピックマップ]").runs[0].font.color.rgb = RGBColor(0xFF, 0x00, 0x00)
+    for line in part1_text.split("\n"):
+        if line.strip():
+            if line.startswith("# ") or line.startswith("## "):
+                doc.add_heading(line.lstrip("#").strip(), level=2)
+            elif line.startswith("### "):
+                doc.add_heading(line.lstrip("#").strip(), level=3)
+            else:
+                doc.add_paragraph(line)
+
+    doc.add_page_break()
+
+    # 後半パート
+    doc.add_heading(f"後半：Level {level_from}→{level_to} 実践", level=1)
+    doc.add_paragraph("[画像挿入箇所：Level構造図]").runs[0].font.color.rgb = RGBColor(0xFF, 0x00, 0x00)
+    for line in part2_text.split("\n"):
+        if line.strip():
+            if line.startswith("# ") or line.startswith("## "):
+                doc.add_heading(line.lstrip("#").strip(), level=2)
+            elif line.startswith("### "):
+                doc.add_heading(line.lstrip("#").strip(), level=3)
+            else:
+                doc.add_paragraph(line)
+
+    word_file = os.path.join(save_dir, f"第{lecture_num:02d}回_講義資料.docx")
+    doc.save(word_file)
+    print(f"✅ Wordファイル保存：{word_file}")
+
+    # 画像プロンプト一覧を別ファイルで保存
+    image_prompts = [
+        {
+            "section": "今月のAI業界トピックマップ",
+            "prompt": f"ナノバナナプロで以下の内容を図解してください。\n"
+                      f"第{lecture_num}回AI活用講義の前半パートで扱う今月のAI業界最新トピック5〜7つを\n"
+                      f"中心から放射状に広がるマインドマップ形式で整理。\n"
+                      f"スタイル：霞が関のポンチ絵のように情報を整理。サイズ：横長16:9",
+            "location": "前半パート冒頭"
+        },
+        {
+            "section": "Level構造図",
+            "prompt": f"ナノバナナプロで以下のレベル構造を図解してください。\n"
+                      f"Level 1（質問・回答のみ）→Level 2（プロンプト工夫）→Level 3（API活用）→"
+                      f"Level 4（複数AI連携）→Level 5（AI組織経営）の5段階の階段図。\n"
+                      f"Level {level_from}からLevel {level_to}の部分をハイライト。\n"
+                      f"各Levelの説明を簡潔に記載。サイズ：横長16:9",
+            "location": "後半パート冒頭"
+        },
+        {
+            "section": "実践ワークフロー図",
+            "prompt": f"ナノバナナプロで以下のフローを図解してください。\n"
+                      f"第{lecture_num}回の実践ワーク（Level {level_from}→{level_to}）の\n"
+                      f"ステップ1→ステップ2→ステップ3の流れを横方向のフローチャートで表現。\n"
+                      f"各ステップにアイコンを追加。\n"
+                      f"スタイル：シンプルで見やすいフローチャート。背景は白。サイズ：横長16:9",
+            "location": "後半パート・実践ワークセクション"
+        },
+    ]
+
+    prompt_file = os.path.join(save_dir, f"第{lecture_num:02d}回_画像プロンプト一覧.txt")
+    with open(prompt_file, "w") as f:
+        f.write(f"=== 第{lecture_num:02d}回 画像プロンプト一覧 ===\n")
+        f.write("以下をGemini（ナノバナナプロ）に貼り付けて画像を生成してください。\n\n")
+        for i, p in enumerate(image_prompts, 1):
+            f.write(f"【画像{i}：{p['section']}用】\n")
+            f.write(f"ナノバナナプロへの指示：\n{p['prompt']}\n")
+            f.write(f"挿入箇所：{p['location']}\n\n")
+        f.write("=== 画像プロンプト終わり ===\n")
+
+    print(f"✅ 画像プロンプト一覧：{prompt_file}")
+
+
 CURRICULUM = {
     1:  (1, 2),
     2:  (1, 2),
