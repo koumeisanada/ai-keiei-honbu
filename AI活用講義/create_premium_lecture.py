@@ -1,35 +1,18 @@
 import os
-import json
 from datetime import datetime
 from docx import Document
-from docx.shared import Pt, Inches, RGBColor, Cm
+from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.style import WD_STYLE_TYPE
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
 from google import genai
 from google.genai import types
 import anthropic
-import openai
+from openai import OpenAI
 
-# APIクライアント初期化
 gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+claude_client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-# OpenAI・Anthropicはキーがある場合のみ初期化
-_openai_key = os.environ.get("OPENAI_API_KEY")
-_anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
-if _openai_key:
-    openai_client = openai.OpenAI(api_key=_openai_key)
-if _anthropic_key:
-    claude_client = anthropic.Anthropic(api_key=_anthropic_key)
-claude_client = anthropic.Anthropic()
-
-SAVE_DIR = os.path.expanduser(
-    "~/Desktop/AI経営本部/AI活用講義/講義資料/第01回"
-)
-
-def generate_with_gemini_search(prompt):
-    """Gemini：リサーチ・最新情報収集に使用"""
+def gemini_search(prompt):
     try:
         response = gemini_client.models.generate_content(
             model="gemini-2.5-flash",
@@ -39,188 +22,39 @@ def generate_with_gemini_search(prompt):
             )
         )
         return response.text
-    except Exception as e:
-        print(f"Gemini検索エラー：{e}")
-        return generate_with_gemini(prompt)
+    except Exception:
+        return gemini_generate(prompt)
 
-def generate_with_gemini(prompt):
-    """Gemini：文章生成・構造化に使用"""
+def gemini_generate(prompt):
     response = gemini_client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt
     )
     return response.text
 
-def generate_with_chatgpt(prompt):
-    """ChatGPT：論理チェック・正確性確認に使用"""
-    if _openai_key:
-        response = openai_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=4000
-        )
-        return response.choices[0].message.content
-    else:
-        print("  （OpenAI APIキー未設定→Geminiで論理チェック代替）")
-        return generate_with_gemini(prompt)
+def chatgpt_check(prompt):
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=3000
+    )
+    return response.choices[0].message.content
 
-def generate_with_claude(prompt):
-    """Claude：修正・完成・最終仕上げに使用"""
-    if _anthropic_key:
+def claude_revise(prompt):
+    try:
         message = claude_client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=4000,
+            max_tokens=6000,
             messages=[{"role": "user", "content": prompt}]
         )
         return message.content[0].text
-    else:
-        print("  （Anthropic APIキー未設定→Geminiで最終仕上げ代替）")
-        return generate_with_gemini(prompt)
+    except Exception as e:
+        print(f"  Claude APIエラー：{e}")
+        print("  → ChatGPTで最終仕上げを代替します")
+        return chatgpt_check(prompt)
 
-def step1_research(today):
-    """Step1：Gemini（検索）で最新情報・根拠データを収集"""
-    print("Step1：Gemini検索で最新情報・根拠データを収集中...")
-
-    prompt = f"""
-【調査日】{today}
-
-以下のテーマについて最新の情報・統計データ・研究結果を調査してください。
-
-テーマ：「AIを活用する際のやってはいけないこと・注意事項」
-
-【調査項目】
-1. APIキーの漏洩による被害事例と金額（具体的な数字）
-2. ハルシネーション（AIの誤情報）の発生率データ
-3. AI利用による情報漏洩事例（企業・個人）
-4. 著作権侵害に関する最新の法律・判例
-5. AI利用に関する各国の規制動向（日本・EU・米国）
-6. AI過信による業務上の失敗事例
-7. セキュリティ企業が報告するAI関連リスク統計
-8. AI利用コスト管理の失敗事例（トークン爆発）
-
-各項目について：
-・具体的な数字・パーセンテージ
-・情報源（企業名・機関名・発表年）
-・日本語で出力
-
-これらは講義資料の根拠データとして使用します。
-"""
-    return generate_with_gemini_search(prompt)
-
-def step2_structure(research_data, today):
-    """Step2：Geminiで講義資料の構造・内容を生成"""
-    print("Step2：Geminiで講義資料の構造・内容を生成中...")
-
-    prompt = f"""
-【調査日】{today}
-
-以下のリサーチデータを元に
-真田孔明のAI活用講座 第1回講義の
-「AIと向き合う前に知っておくべきこと」の
-完全な講義資料を作成してください。
-
-【リサーチデータ】
-{research_data[:4000]}
-
-【講義の位置づけ】
-・第1回講義の後半パート
-・受講生がLevel 1→5を目指す前に必ず知っておくべき基礎知識
-
-【文章スタイル】
-・全ての主張に客観的な根拠・データを付ける
-・結論→根拠→事実→応用の順で書く
-・感情訴求は使わない
-
-セクション：
-1. AIとの向き合い方の全体像
-2. APIキーの管理と取り扱い
-3. ハルシネーションへの対処法
-4. 著作権・知的財産の基本
-5. プライバシー・情報漏洩リスク
-6. トークンコスト・メモリ管理
-7. 法的リスク・規制への対応
-8. 実務でよくある間違いTOP10
-9. AIと安全に向き合うための10の鉄則
-"""
-    return generate_with_gemini(prompt)
-
-def step3_logic_check(structured_content, today):
-    """Step3：ChatGPTで論理チェック・正確性確認"""
-    print("Step3：ChatGPTで論理チェック・正確性確認中...")
-
-    prompt = f"""
-以下は真田孔明のAI活用講座 第1回講義資料の草稿です。
-
-{structured_content[:5000]}
-
-あなたは「論理チェック担当AI」です。以下の観点で厳密にチェックしてください。
-
-【チェック項目】
-1. 論理整合性：主張と根拠が一致しているか。矛盾した記述がないか
-2. データの正確性：引用されている統計・数字は正確か。出典は信頼できるか
-3. 因果関係：「なぜなら」「つまり」の前後が論理的に繋がっているか
-4. 網羅性：重要な注意事項が漏れていないか
-5. 受講生視点：Level 1の初心者でも理解できる説明になっているか
-
-【出力形式】
-## 論理チェック結果
-
-### 問題なし（✅）の箇所
-（正確・論理的に整合している箇所を列挙）
-
-### 要修正（⚠️）の箇所
-各箇所について：
-・問題の内容
-・なぜ問題か
-・修正案
-
-### 追加すべき内容
-（漏れている重要な注意事項があれば）
-
-### 総合評価
-（100点満点で採点＋改善の優先順位）
-"""
-    return generate_with_chatgpt(prompt)
-
-def step4_final_revision(structured_content, logic_feedback, today):
-    """Step4：Claudeで修正・完成"""
-    print("Step4：Claudeで修正・最終完成中...")
-
-    prompt = f"""
-あなたは「最終仕上げ担当AI」です。
-
-【元の草稿】
-{structured_content[:3000]}
-
-【ChatGPTによる論理チェック結果】
-{logic_feedback[:2000]}
-
-上記のフィードバックを全て反映して、講義資料を修正・完成させてください。
-
-【修正ルール】
-1. ChatGPTが指摘した「要修正」箇所を全て修正する
-2. 「追加すべき内容」があれば適切な場所に追加する
-3. 真田孔明のAI経営本部の実体験を反映する
-4. 全ての主張に客観的な根拠・データを付ける
-5. 結論→根拠→事実→応用の順で書く
-6. 感情訴求は使わない
-7. Level 1の初心者でも理解できる表現にする
-
-【出力形式】
-## 修正サマリー
-（何を修正したかを箇条書きで）
-
-## 修正後の完成版コンテンツ
-（完成した講義資料の全文）
-"""
-    return generate_with_claude(prompt)
-
-def create_word_document(content_data, image_prompts, today, lecture_num=1):
-    """Word文書の生成"""
-    print("Wordファイルを生成中...")
-
+def save_word(content, filepath, title, subtitle, today, lecture_num, file_type):
     doc = Document()
-
     section = doc.sections[0]
     section.page_width = Inches(8.27)
     section.page_height = Inches(11.69)
@@ -229,317 +63,402 @@ def create_word_document(content_data, image_prompts, today, lecture_num=1):
     section.top_margin = Inches(1)
     section.bottom_margin = Inches(1)
 
-    # 表紙
-    cover_title = doc.add_paragraph()
-    cover_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = cover_title.add_run(f'第{lecture_num:02d}回 AI活用講義')
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = p.add_run(f'第{lecture_num:02d}回 AI活用講義')
     run.font.size = Pt(28)
     run.font.bold = True
     run.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
 
     doc.add_paragraph()
 
-    subtitle_p = doc.add_paragraph()
-    subtitle_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    subtitle_run = subtitle_p.add_run('AIと向き合う前に知っておくべきこと')
-    subtitle_run.font.size = Pt(18)
-    subtitle_run.font.color.rgb = RGBColor(0x16, 0x21, 0x3E)
+    p2 = doc.add_paragraph()
+    p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run2 = p2.add_run(subtitle)
+    run2.font.size = Pt(16)
+    run2.font.color.rgb = RGBColor(0x16, 0x21, 0x3E)
 
     doc.add_paragraph()
 
-    date_p = doc.add_paragraph()
-    date_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    date_run = date_p.add_run(f'真田孔明 AI活用講座　{today}')
-    date_run.font.size = Pt(12)
-    date_run.font.color.rgb = RGBColor(0x88, 0x87, 0x80)
+    p3 = doc.add_paragraph()
+    p3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run3 = p3.add_run(
+        '制作：Gemini（検索・生成）× ChatGPT（論理チェック）× Claude（修正・完成）'
+    )
+    run3.font.size = Pt(9)
+    run3.font.color.rgb = RGBColor(0x53, 0x4A, 0xB7)
 
-    doc.add_page_break()
-
-    # 目次
-    h = doc.add_heading('■ 目次', level=1)
-    for r in h.runs: r.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
-    toc_items = [
-        "第1章：AIとの向き合い方の全体像",
-        "第2章：APIキーの管理と取り扱い",
-        "第3章：ハルシネーションへの対処法",
-        "第4章：著作権・知的財産の基本",
-        "第5章：プライバシー・情報漏洩リスク",
-        "第6章：トークンコスト・メモリ管理",
-        "第7章：法的リスク・規制への対応",
-        "第8章：実務でよくある間違いTOP10",
-        "第9章：AIと安全に向き合うための10の鉄則",
-        "チェックリスト"
-    ]
-    for item in toc_items:
-        doc.add_paragraph(item, style='List Number')
-
-    doc.add_page_break()
-
-    # ゴール
-    h = doc.add_heading('■ 今回の講義のゴール', level=1)
-    for r in h.runs: r.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
-    for goal in ["AIを安全に使うための基本ルールを理解する",
-                  "APIキーの正しい管理方法を実践できるようになる",
-                  "トークンコストを最小化する設計思想を身につける"]:
-        p = doc.add_paragraph()
-        p.add_run('✅ ').font.size = Pt(11)
-        p.add_run(goal).font.size = Pt(11)
     doc.add_paragraph()
 
-    # セクション
-    sections_data = [
-        ("第1章：AIとの向き合い方の全体像",
-         "[画像挿入：AIリスク4大カテゴリの構造図]",
-         "AIを活用する上で最初に知っておくべき全体像があります。\n\n"
-         "【根拠：McKinsey Global Institute報告】\nAIを導入した企業の67%が導入初期に何らかのリスク・トラブルを経験。\n\n"
-         "AIリスクの4大カテゴリ：\n① セキュリティリスク（APIキー漏洩・情報漏洩）\n"
-         "② 品質リスク（ハルシネーション・誤情報）\n③ 法的リスク（著作権・プライバシー・規制）\n"
-         "④ コストリスク（トークン爆発・予算超過）\n\nこの4つを理解すれば安全かつ低コストでAI活用ができます。"),
-        ("第2章：APIキーの管理と取り扱い",
-         "[画像挿入：APIキー管理フローチャート]",
-         "APIキーとはAIサービスにプログラムからアクセスするための「鍵」です。\n\n"
-         "【根拠：GitHub Security Advisory】\n2024年だけで約100万件のAPIキー漏洩が検出。\n"
-         "数時間で数百万円の請求が発生した事例が世界中で報告されています。\n\n"
-         "❌ やってはいけないこと：\n・コードにAPIキーを直接書く\n・GitHubにAPIキーを含むファイルをアップロードする\n"
-         "・メモ帳・Notionにそのまま保存する\n\n"
-         "✅ 正しい管理方法：\n・環境変数として保存する（~/.zshrc）\n・.gitignoreでAPIキー関連ファイルを除外\n"
-         "・月額上限（Spending limit）を必ず設定\n\n漏洩に気づいたら→1分以内に無効化することが損害最小化の鍵。"),
-        ("第3章：ハルシネーションへの対処法",
-         "[画像挿入：AI別ハルシネーション発生率比較グラフ]",
-         "ハルシネーションとはAIが事実と異なる情報を自信満々に出力する現象です。\n\n"
-         "【根拠：Stanford University AI Index 2024】\n・ChatGPT-4の誤情報生成率：約15〜20%\n"
-         "・Claude 3の誤情報生成率：約10〜15%\n・Gemini 1.5の誤情報生成率：約12〜18%\n\n"
-         "❌ やってはいけないこと：\n・AI出力をそのまま事実として公開する\n・数字・統計・固有名詞を確認せずに使用する\n\n"
-         "✅ 正しい対処法：\n・重要な情報は必ず一次情報源で確認\n・AIの出力を「草稿」として扱い人間がレビュー\n"
-         "・複数のAIで結果を比較する\n\n【事例】米国弁護士がAI生成の存在しない判例を裁判所に提出→制裁金・業務停止処分"),
-        ("第4章：著作権・知的財産の基本",
-         "[画像挿入：著作権判断フローチャート]",
-         "AI生成コンテンツの著作権は世界中で法整備が進んでいます。\n\n"
-         "【根拠：文化庁 2024年3月】\nAIが自律的に生成したコンテンツは著作権法上の「著作物」に該当しない可能性がある。\n"
-         "人間が創作的寄与を行った場合は認められる場合がある。\n\n"
-         "【根拠：EU AI法 2024年施行】\nAI生成コンテンツには表示義務。違反時最大で全世界年間売上の3%制裁金。\n\n"
-         "❌ やってはいけないこと：\n・AI生成コンテンツをそのまま著作物として権利主張\n"
-         "・AI生成であることを隠して販売・配布\n\n"
-         "✅ 正しい対応：\n・AI生成コンテンツには編集・改善を加えて創作的寄与を行う\n"
-         "・商業利用の場合は各AIサービスの利用規約を確認"),
-        ("第5章：プライバシー・情報漏洩リスク",
-         "[画像挿入：AIに入力してよい情報・いけない情報の分類図]",
-         "AIに入力した情報がどこへ行くのかを正確に理解することが重要です。\n\n"
-         "【根拠：個人情報保護委員会 2024年ガイドライン】\n"
-         "AIサービスに入力した個人情報はサービス提供企業のサーバーに送信されます。\n\n"
-         "❌ 絶対にAIに入力してはいけない情報：\n・顧客の個人情報（氏名・住所・電話番号）\n"
-         "・クレジットカード番号・銀行口座情報\n・マイナンバー・健康保険証番号\n"
-         "・会社の機密情報・未公開の財務情報\n・パスワード・認証情報\n\n"
-         "【事例】Samsung社員がChatGPTに社内ソースコードを入力し漏洩（2023年）\n"
-         "日本企業でも同様の事例が2024年に23件報告"),
-        ("第6章：トークンコスト・メモリ管理",
-         "[画像挿入：トークンコスト増加グラフ・SKILLファイル方式の構造図]",
-         "AIのコスト管理を知らずに実装すると毎月想定外の高額請求が来ます。\n\n"
-         "【トークン課金の仕組み】\n入力トークン数×単価＋出力トークン数×単価＝1回の処理コスト\n\n"
-         "【参考単価（2026年3月現在）】\n・Claude Sonnet：入力$3/百万トークン・出力$15/百万トークン\n"
-         "・Gemini 2.5 Flash：入力$0.075/百万トークン\n\n"
-         "❌ 失敗パターン：全会話履歴をコンテキストに含める設計\n"
-         "→1日目：1,000トークン→1ヶ月後：30,000トークン＝コスト30倍\n\n"
-         "✅ 正しい設計：\n・SKILLファイル方式：AIの記憶はファイルで管理（必要時だけ読み込む）\n"
-         "・直近N件のみ使用（全履歴ではなく直近5件のみ）\n・CLAUDE.md方式：各フォルダのCLAUDE.mdがAIの記憶として機能\n\n"
-         "【真田孔明の実体験】全会話履歴をコンテキストに含める設計→月間API費用が想定の10〜30倍に"),
-        ("第7章：法的リスク・規制への対応",
-         "[画像挿入：世界のAI規制マップ]",
-         "AI利用に関する規制は2024〜2026年にかけて急速に整備されています。\n\n"
-         "【日本】\n・個人情報保護法：AI利用における個人情報取扱いガイドライン（2024年）\n"
-         "・著作権法：AI学習・生成に関する解釈指針（文化庁 2024年）\n\n"
-         "【EU AI法】\n・2024年8月施行・2026年完全適用\n・AIシステムをリスクレベルで分類\n"
-         "・違反時：最大3,000万ユーロまたは全世界年間売上の6%\n\n"
-         "【米国】\n・2023年大統領令：AI安全性に関する包括的規制枠組み\n"
-         "・FTC：AIを使った虚偽広告・詐欺への厳格な対応\n\n"
-         "日本のビジネスオーナーへの影響：\n・EU市民にサービス提供する場合はEU AI法が適用される可能性\n"
-         "・AIを使ったマーケティングは景品表示法の対象"),
-        ("第8章：実務でよくある間違いTOP10",
-         "[画像挿入：失敗TOP10のランキング図]",
-         "AI活用の現場で最も多く発生する間違いを根拠データと共に解説します。\n\n"
-         "【根拠：Gartner AI導入失敗事例調査 2024年】\nAI導入プロジェクトの失敗率：約30%\n\n"
-         "1位：AI出力をそのまま使う（ハルシネーション率15〜20%を見落とす）\n"
-         "2位：APIキーをコードに直書き（GitHubに公開した瞬間に漏洩）\n"
-         "3位：全会話履歴をコンテキストに含める（コスト30倍）\n"
-         "4位：個人情報をAIに入力する（個人情報保護法違反）\n"
-         "5位：AI生成コンテンツを確認せずに公開（誤情報・著作権侵害）\n"
-         "6位：一つのAIだけに依存する（サービス停止リスク）\n"
-         "7位：プロンプトを曖昧にする（手戻り発生）\n"
-         "8位：AIへの過度な期待（人間の判断が必要な業務を丸投げ）\n"
-         "9位：バックアップ・バージョン管理をしない（データ消失）\n"
-         "10位：コスト管理をしない（月額上限未設定で高額請求）"),
-        ("第9章：AIと安全に向き合うための10の鉄則",
-         "[画像挿入：10の鉄則インフォグラフィック]",
-         "真田孔明AI経営本部が実践している10の鉄則を公開します。\n\n"
-         "鉄則1：APIキーは必ず環境変数で管理する\n→根拠：年間100万件以上のGitHub漏洩事例\n\n"
-         "鉄則2：全ての出力に人間のレビューを入れる\n→根拠：ハルシネーション率最高20%\n\n"
-         "鉄則3：個人情報・機密情報はAIに入力しない\n→根拠：2024年日本で23件の漏洩事例\n\n"
-         "鉄則4：月額上限（Spending limit）を必ず設定する\n→根拠：コスト30倍になった実体験\n\n"
-         "鉄則5：AIの記憶はSKILLファイルで管理する\n→根拠：会話履歴蓄積でコスト指数関数的増加\n\n"
-         "鉄則6：著作権法・個人情報保護法を定期的に確認する\n→根拠：2024〜2026年に急速な法整備\n\n"
-         "鉄則7：3大AIを用途に応じて使い分ける\n→根拠：Claude品質チェック・Gemini検索・ChatGPT多様性\n\n"
-         "鉄則8：GitHubで全データをバージョン管理する\n→根拠：データ消失リスクの排除\n\n"
-         "鉄則9：毎月のAPI使用量を確認する習慣をつける\n→根拠：異常増加は不正使用のサイン\n\n"
-         "鉄則10：AIを「道具」ではなく「組織」として設計する\n→根拠：1人で5名分のアウトプットが可能になった実証")
-    ]
+    p4 = doc.add_paragraph()
+    p4.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run4 = p4.add_run(f'真田孔明 AI活用講座　{today}')
+    run4.font.size = Pt(11)
+    run4.font.color.rgb = RGBColor(0x88, 0x87, 0x80)
 
-    for title_text, image_text, content_text in sections_data:
-        h = doc.add_heading(title_text, level=1)
-        for r in h.runs: r.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
-
-        img_p = doc.add_paragraph()
-        img_run = img_p.add_run(image_text)
-        img_run.font.color.rgb = RGBColor(0xFF, 0x69, 0x00)
-        img_run.font.bold = True
-        img_run.font.size = Pt(10)
-
-        for line in content_text.split('\n'):
-            if line.strip():
-                p = doc.add_paragraph(line)
-                if line.startswith('❌'):
-                    p.runs[0].font.color.rgb = RGBColor(0xFF, 0x00, 0x00)
-                elif line.startswith('✅'):
-                    p.runs[0].font.color.rgb = RGBColor(0x00, 0x80, 0x00)
-
-        doc.add_paragraph()
-
-    # チェックリスト
     doc.add_page_break()
-    h = doc.add_heading('■ 受講生向けチェックリスト', level=1)
-    for r in h.runs: r.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
-    for item in [
-        "APIキーを環境変数で管理している",
-        ".gitignoreにAPIキー関連ファイルを追加している",
-        "各AIサービスに月額上限を設定している",
-        "AIの記憶をSKILLファイルで管理している",
-        "毎月のAPI使用量を確認する習慣がある",
-        "個人情報・機密情報をAIに入力していない",
-        "AI出力を必ずレビューしてから使用している",
-        "著作権・個人情報保護法の動向を把握している",
-        "APIキー漏洩時の対処法を把握している",
-        "3大AIを用途で使い分けている"
-    ]:
-        p = doc.add_paragraph()
-        p.add_run('☐ ').font.size = Pt(12)
-        p.add_run(item).font.size = Pt(10.5)
 
-    os.makedirs(SAVE_DIR, exist_ok=True)
-    word_file = os.path.join(SAVE_DIR, "第01回_講義資料_AIと向き合う前に知っておくべきこと.docx")
-    doc.save(word_file)
-    print(f"✅ Wordファイル保存完了：{word_file}")
-    return word_file
+    for line in content.split('\n'):
+        if not line.strip():
+            doc.add_paragraph()
+            continue
+        if line.startswith('# ') or line.startswith('## '):
+            h = doc.add_heading(
+                line.replace('## ', '').replace('# ', ''), level=1
+            )
+            for r in h.runs:
+                r.font.color.rgb = RGBColor(0x1A, 0x1A, 0x2E)
+        elif line.startswith('### '):
+            h = doc.add_heading(line.replace('### ', ''), level=2)
+            for r in h.runs:
+                r.font.color.rgb = RGBColor(0x16, 0x21, 0x3E)
+        elif line.startswith('❌'):
+            p = doc.add_paragraph()
+            r = p.add_run(line)
+            r.font.color.rgb = RGBColor(0xCC, 0x00, 0x00)
+            r.font.size = Pt(10.5)
+        elif line.startswith('✅'):
+            p = doc.add_paragraph()
+            r = p.add_run(line)
+            r.font.color.rgb = RGBColor(0x00, 0x80, 0x00)
+            r.font.size = Pt(10.5)
+        elif line.startswith('[画像挿入'):
+            p = doc.add_paragraph()
+            r = p.add_run(line)
+            r.font.color.rgb = RGBColor(0xFF, 0x69, 0x00)
+            r.font.bold = True
+            r.font.size = Pt(10)
+        else:
+            p = doc.add_paragraph(line)
+            for r in p.runs:
+                r.font.size = Pt(10.5)
 
-def create_image_prompts(today):
-    """ナノバナナプロ用画像プロンプト一覧を生成"""
-    print("ナノバナナプロ用画像プロンプトを生成中...")
-    prompts = [
-        {"num": 1, "section": "第1章：全体像",
-         "prompt": "ナノバナナプロで以下の内容を図解してください。\nタイトル：AIリスク4大カテゴリ\n中心に「AI活用」を置き4つのリスクを周囲に配置\n① セキュリティリスク（APIキー漏洩・情報漏洩）\n② 品質リスク（ハルシネーション・誤情報）\n③ 法的リスク（著作権・プライバシー・規制）\n④ コストリスク（トークン爆発・予算超過）\n各カテゴリにアイコン追加。配色：ネイビー・オレンジ・ホワイト\nスタイル：霞が関のポンチ絵のように全情報を一枚にまとめて。サイズ：横長16:9",
-         "location": "第1章の冒頭"},
-        {"num": 2, "section": "第2章：APIキー管理",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：APIキーの正しい管理フロー\n左側に「❌悪い例」右側に「✅良い例」を対比\n悪い例：コードに直接記載→GitHubにアップ→漏洩→高額請求\n良い例：環境変数に保存→コードから呼び出し→安全\n下部に「漏洩時の対処フロー」追加\nスタイル：フローチャート形式。サイズ：横長16:9",
-         "location": "第2章の冒頭"},
-        {"num": 3, "section": "第3章：ハルシネーション",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI別ハルシネーション発生率比較\n棒グラフ形式で3つのAIを比較\nChatGPT-4：15〜20%\nClaude 3：10〜15%\nGemini 1.5：12〜18%\n出典：Stanford University AI Index 2024\n右側に正しい対処法を箇条書き\nスタイル：データビジュアライゼーション。サイズ：横長16:9",
-         "location": "第3章の冒頭"},
-        {"num": 4, "section": "第4章：著作権",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI生成コンテンツの著作権判断フロー\nフローチャート：AI生成コンテンツ→人間の創作的寄与あり？→Yes：著作権認められる可能性→No：著作物に該当しない可能性\n配色：ネイビー・グレー・グリーン\nスタイル：判断フローチャート。サイズ：横長16:9",
-         "location": "第4章の冒頭"},
-        {"num": 5, "section": "第5章：プライバシー",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AIに入力してよい情報・いけない情報\n2列比較：❌入力禁止（個人情報・カード番号・機密情報等）vs ✅入力可能（匿名データ・公開情報・自分の考え等）\nスタイル：2列比較図。サイズ：横長16:9",
-         "location": "第5章の冒頭"},
-        {"num": 6, "section": "第6章：コスト管理",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：トークンコスト増加の仕組みとSKILLファイル方式\n上段：折れ線グラフ「全履歴方式のコスト推移」1,000→7,000→30,000トークン\n下段：❌全履歴方式（コスト30倍）vs ✅SKILLファイル方式（コスト一定）\nスタイル：グラフ＋構造図。サイズ：横長16:9",
-         "location": "第6章の冒頭"},
-        {"num": 7, "section": "第7章：法的リスク",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：世界のAI規制マップ2026\n世界地図ベースで各国の規制を表示\nEU：EU AI法・違反時最大6%制裁金\n日本：個人情報保護法・著作権法\n米国：大統領令・FTC規制\nスタイル：地図＋テキスト。サイズ：横長16:9",
-         "location": "第7章の冒頭"},
-        {"num": 8, "section": "第8章：失敗TOP10",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI活用でよくある失敗TOP10\nランキング形式で1位〜10位を表示\n各項目に危険度アイコン追加\nスタイル：ランキングリスト形式。サイズ：横長16:9",
-         "location": "第8章の冒頭"},
-        {"num": 9, "section": "第9章：10の鉄則",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AIと安全に向き合うための10の鉄則\n10個の鉄則を左右2列のインフォグラフィック形式で表示\n各鉄則にアイコン追加\n配色：ネイビー・ゴールド・ホワイト\nスタイル：インフォグラフィック。サイズ：横長16:9",
-         "location": "第9章の冒頭"},
-        {"num": 10, "section": "チェックリスト",
-         "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI安全活用チェックリスト\n10項目をグループ分け：セキュリティ・コスト管理・法的対応・品質管理\n各項目にチェックボックス追加\nスタイル：チェックリスト形式。サイズ：横長16:9",
-         "location": "チェックリストページ"}
-    ]
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    doc.save(filepath)
+    print(f"✅ Word保存完了：{filepath}")
+    return filepath
+
+def create_image_prompts(today, file_type):
+    if file_type == "news":
+        prompts = [
+            {"num": 1, "section": "今月のトピック全体像",
+             "location": "冒頭",
+             "prompt": "ナノバナナプロで今月のAI業界トピックを図解してください。\n霞が関のポンチ絵のように全ての情報を一枚の画像にまとめて。\nサイズ：横長16:9"},
+            {"num": 2, "section": "具体的な活用方法",
+             "location": "活用方法セクション",
+             "prompt": "ナノバナナプロで今月の具体的なAI活用方法をステップ形式で図解してください。\nサイズ：横長16:9"},
+        ]
+    else:
+        prompts = [
+            {"num": 1, "section": "全体像：Level 1〜5ロードマップ",
+             "location": "パート1冒頭",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI活用Level 1〜5ロードマップ\nLevel 1（約80%）：質問・回答のみ\nLevel 2（約15%）：プロンプト工夫・業務組み込み\nLevel 3（約4%）：API活用・自動化\nLevel 4（約0.9%）：複数AI連携・エージェント設計\nLevel 5（約0.1%）：AI組織経営・完全自動化\n階段または三角形の図。各Levelに人数割合を記載。\nサイズ：横長16:9"},
+            {"num": 2, "section": "AI経営本部の全体構造",
+             "location": "全体像セクション",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI経営本部の全体構造\n中心にAI社長、周囲に5名のAIマネージャー\n3大AI（Claude・Gemini・ChatGPT）の役割分担\n自動パイプラインの流れ\nスタイル：組織図形式。サイズ：横長16:9"},
+            {"num": 3, "section": "年間24回学習ロードマップ",
+             "location": "ロードマップセクション",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：年間24回学習ロードマップ\n月2回×12ヶ月のタイムライン\n各フェーズのLevel到達目標を記載\nスタイル：横型タイムライン。サイズ：横長16:9"},
+            {"num": 4, "section": "AIリスク4大カテゴリ",
+             "location": "注意事項パート冒頭",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AIリスク4大カテゴリ\n①セキュリティリスク②品質リスク③法的リスク④コストリスク\n各カテゴリにアイコンと具体例を追加\nスタイル：霞が関のポンチ絵。サイズ：横長16:9"},
+            {"num": 5, "section": "APIキー管理フロー",
+             "location": "APIキー管理セクション",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：APIキーの正しい管理フロー\n左：❌悪い例（コードに直書き→漏洩→高額請求）\n右：✅良い例（環境変数→安全）\n下：漏洩時の対処法（1分以内に無効化）\nサイズ：横長16:9"},
+            {"num": 6, "section": "ハルシネーション発生率",
+             "location": "ハルシネーションセクション",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI別ハルシネーション発生率比較\nChatGPT-4：15〜20%、Claude 3：10〜15%、Gemini 1.5：12〜18%\n棒グラフ形式。出典：Stanford AI Index 2024\nサイズ：横長16:9"},
+            {"num": 7, "section": "トークンコスト比較",
+             "location": "コスト管理セクション",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：トークンコスト増加の仕組み\n全履歴方式：1日目1,000→1週間7,000→1ヶ月30,000トークン\nSKILLファイル方式：常に一定\n折れ線グラフ＋比較図。サイズ：横長16:9"},
+            {"num": 8, "section": "失敗TOP10",
+             "location": "よくある間違いセクション",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AI活用でよくある失敗TOP10\nランキング形式で1〜10位を表示\n各項目に危険度アイコンを追加\nサイズ：横長16:9"},
+            {"num": 9, "section": "10の鉄則",
+             "location": "鉄則セクション",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：AIと安全に向き合うための10の鉄則\n10個の鉄則を番号付きで2列に配置\n各鉄則にアイコンを追加\nスタイル：インフォグラフィック形式。サイズ：横長16:9"},
+            {"num": 10, "section": "チェックリスト",
+             "location": "チェックリストページ",
+             "prompt": "ナノバナナプロで以下を図解してください。\nタイトル：受講生向けチェックリスト\n10項目のチェックリストをグループ分けして表示\nA4印刷対応。サイズ：横長16:9"},
+        ]
     return prompts
 
-def main():
-    today = datetime.now().strftime("%Y年%m月%d日")
-    os.makedirs(SAVE_DIR, exist_ok=True)
-
-    print("=" * 60)
-    print("最高品質講義資料制作システム起動")
-    print("3大AI完全役割分担：")
-    print("  Step1: Gemini（検索）→ 最新情報・根拠データ収集")
-    print("  Step2: Gemini（生成）→ 講義資料の構造・内容生成")
-    print("  Step3: ChatGPT（論理チェック）→ 正確性・論理性確認")
-    print("  Step4: Claude（修正・完成）→ フィードバック反映・最終仕上げ")
-    print("  Step5: Word生成＋画像プロンプト")
-    ai_status = []
-    ai_status.append(f"  Gemini: {'✅ 有効' if os.environ.get('GEMINI_API_KEY') else '❌ 未設定'}")
-    ai_status.append(f"  ChatGPT: {'✅ 有効' if _openai_key else '⚠️ 未設定（Gemini代替）'}")
-    ai_status.append(f"  Claude: {'✅ 有効' if _anthropic_key else '⚠️ 未設定（Gemini代替）'}")
-    for s in ai_status: print(s)
-    print("=" * 60)
-
-    research_data = step1_research(today)
-    with open(os.path.join(SAVE_DIR, "リサーチデータ.md"), "w") as f:
-        f.write(f"# リサーチデータ\n## {today}\n\n{research_data}")
-    print("✅ Step1完了：リサーチデータ収集")
-
-    structured_content = step2_structure(research_data, today)
-    with open(os.path.join(SAVE_DIR, "草稿.md"), "w") as f:
-        f.write(f"# 草稿\n## {today}\n\n{structured_content}")
-    print("✅ Step2完了：講義資料草稿生成")
-
-    logic_feedback = step3_logic_check(structured_content, today)
-    with open(os.path.join(SAVE_DIR, "Step3_ChatGPT論理チェック.md"), "w") as f:
-        f.write(f"# ChatGPT論理チェック結果\n## {today}\n\n{logic_feedback}")
-    print("✅ Step3完了：ChatGPT論理チェック")
-
-    final_content = step4_final_revision(structured_content, logic_feedback, today)
-    with open(os.path.join(SAVE_DIR, "Step4_Claude修正完成版.md"), "w") as f:
-        f.write(f"# Claude修正完成版\n## {today}\n\n{final_content}")
-    print("✅ Step4完了：Claude修正・最終完成")
-
-    word_file = create_word_document(final_content, [], today)
-    print("✅ Step4完了：Wordファイル生成")
-
-    image_prompts = create_image_prompts(today)
-    prompt_file = os.path.join(SAVE_DIR, "ナノバナナプロ_画像プロンプト一覧.txt")
-    with open(prompt_file, "w") as f:
+def save_image_prompts(prompts, save_dir, lecture_num, today, file_type):
+    label = "AI最新情報用" if file_type == "news" else "Level講義用"
+    filepath = os.path.join(
+        save_dir,
+        f"第{lecture_num:02d}回_画像プロンプト_{label}.txt"
+    )
+    with open(filepath, "w") as f:
         f.write("=" * 60 + "\n")
-        f.write("ナノバナナプロ 画像生成プロンプト一覧\n")
-        f.write("以下を順番にナノバナナプロに貼り付けて画像を生成してください。\n")
+        f.write(f"ナノバナナプロ 画像プロンプト一覧（{label}）\n")
+        f.write(f"作成日：{today}\n")
+        f.write("以下を順番にGemini（ナノバナナプロ）に貼り付けてください。\n")
         f.write("=" * 60 + "\n\n")
-        for p in image_prompts:
+        for p in prompts:
             f.write(f"【画像{p['num']}：{p['section']}】\n")
             f.write(f"挿入箇所：{p['location']}\n")
             f.write(f"プロンプト：\n{p['prompt']}\n")
             f.write("-" * 40 + "\n\n")
-    print(f"✅ Step5完了：画像プロンプト一覧生成（{len(image_prompts)}枚分）")
+    print(f"✅ 画像プロンプト保存：{filepath}")
+    return filepath
+
+def create_level_lecture(lecture_num, today, save_dir):
+    print("\n" + "=" * 60)
+    print(f"ファイル②：Level講義資料を生成中（第{lecture_num}回）")
+    print("=" * 60)
+
+    print("Step1：Gemini（検索）でリサーチ中...")
+    research = gemini_search(f"""
+【調査日】{today}
+
+以下を調査してください。
+
+1. APIキー漏洩による被害事例と金額（具体的な数字・出典）
+2. ハルシネーション発生率データ（各AI比較・Stanford AI Index等）
+3. AI利用による情報漏洩事例（企業・年別）
+4. 著作権・プライバシーに関する最新の法律・判例
+5. AI利用に関する各国の規制動向（2024〜2026年）
+6. トークンコスト管理の失敗事例（金額付き）
+7. AI安全活用のベストプラクティス（公的機関の推奨）
+
+各項目に具体的な数字・情報源・年を付けて日本語で出力してください。
+""")
+    with open(os.path.join(save_dir, "Step1_リサーチ.md"), "w") as f:
+        f.write(research)
+    print("✅ Step1完了")
+
+    print("Step2：Gemini（生成）で草稿作成中...")
+    draft = gemini_generate(f"""
+【調査日】{today}
+【リサーチデータ】
+{research[:3000]}
+
+真田孔明のAI活用講座 第{lecture_num}回講義資料を作成してください。
+
+【構成】
+
+# パート1：全体像（最重要）
+## この講座で1年間何を学ぶか
+## Level 1〜5の定義と現在地の確認
+## 年間24回の学習ロードマップ
+## AI経営本部の全体構造
+## 1年後に手に入るもの
+
+[画像挿入：Level 1〜5ロードマップ図]
+[画像挿入：AI経営本部全体構造図]
+[画像挿入：年間24回学習ロードマップ]
+
+# パート2：AIと向き合う前に知っておくべきこと
+
+## 第1章：AIリスクの全体像
+[画像挿入：AIリスク4大カテゴリ図]
+## 第2章：APIキーの管理と取り扱い
+[画像挿入：APIキー管理フロー図]
+## 第3章：ハルシネーションへの対処法
+[画像挿入：ハルシネーション発生率グラフ]
+## 第4章：著作権・プライバシーリスク
+## 第5章：トークンコスト・メモリ管理
+[画像挿入：トークンコスト比較図]
+## 第6章：法的リスク・規制
+## 第7章：実務でよくある間違いTOP10
+[画像挿入：失敗TOP10ランキング図]
+## 第8章：AIと安全に向き合うための10の鉄則
+[画像挿入：10の鉄則インフォグラフィック]
+
+# パート3：Level 1→2への第一歩
+## 今日から始める具体的なアクション
+## 次回までの宿題
+## 受講生向けチェックリスト
+[画像挿入：チェックリスト図]
+
+【文章スタイル】
+・全ての主張に客観的な根拠・データを付ける
+・結論→根拠→事実→応用の順で書く
+・感情訴求は使わない
+・真田孔明の実体験は具体的な数字で語る
+・文学スキルは使わない
+・日本語で出力する
+""")
+    with open(os.path.join(save_dir, "Step2_草稿.md"), "w") as f:
+        f.write(draft)
+    print("✅ Step2完了")
+
+    print("Step3：ChatGPT（gpt-4o）で論理チェック中...")
+    feedback = chatgpt_check(f"""
+以下はAI活用講座 第1回講義資料の草稿です。
+徹底的な論理チェック・正確性チェックを行い改善フィードバックを出力してください。
+
+【草稿】
+{draft[:4000]}
+
+【チェック項目】
+1. 論理整合性
+2. データ・数字の正確性
+3. 網羅性
+4. 受講生への配慮
+5. 追加すべき重要情報
+
+日本語で出力してください。
+""")
+    with open(os.path.join(save_dir, "Step3_ChatGPTフィードバック.md"), "w") as f:
+        f.write(feedback)
+    print("✅ Step3完了")
+
+    print("Step4：Claude（claude-sonnet-4-6）で修正・完成中...")
+    final = claude_revise(f"""
+以下のChatGPTフィードバックを全て反映して講義資料を修正・完成させてください。
+
+【ChatGPTフィードバック】
+{feedback}
+
+【修正前の草稿】
+{draft[:4000]}
+
+【修正の方針】
+・全ての問題点を修正する
+・不足データを補完する
+・受講生が理解しやすい表現に
+・文学スキルは絶対に使わない
+・日本語で出力する
+""")
+    with open(os.path.join(save_dir, "Step4_Claude完成版.md"), "w") as f:
+        f.write(final)
+    print("✅ Step4完了")
+
+    word_path = os.path.join(
+        save_dir,
+        f"第{lecture_num:02d}回_②Level講義資料_完成版.docx"
+    )
+    save_word(
+        final, word_path,
+        f"第{lecture_num:02d}回 Level講義資料",
+        "全体像＋注意事項＋Level 1→2への第一歩",
+        today, lecture_num, "level"
+    )
+
+    prompts = create_image_prompts(today, "level")
+    save_image_prompts(prompts, save_dir, lecture_num, today, "level")
+
+    return word_path
+
+def create_news_lecture(lecture_num, month_num, today, save_dir):
+    print("\n" + "=" * 60)
+    print(f"ファイル①：AI最新情報資料を生成中（第{lecture_num}回・{month_num}ヶ月目）")
+    print("=" * 60)
+
+    print("Step1：Gemini（検索）で今月の最新AI情報を収集中...")
+    news = gemini_search(f"""
+【調査日】{today}
+
+直近1ヶ月以内のAI業界最新情報を調査してください。
+
+1. 新しいAIモデルのリリース・アップデート
+2. 米国テクノロジー企業のAI戦略最新動向
+3. AI規制・法律の動向
+4. 話題のAIツール・サービスの登場
+5. AIによるビジネス成功事例
+6. 今月最も重要なAIニュースTOP5
+
+各トピックに具体的な内容・情報源・日付を付けて日本語で出力してください。
+""")
+
+    print("Step2：Gemini（生成）で最新情報資料を作成中...")
+    draft_news = gemini_generate(f"""
+【調査日】{today}
+【最新情報データ】
+{news[:3000]}
+
+AI活用講座 第{lecture_num}回「今月のAI最新情報＋具体的な活用方法」を作成してください。
+
+構成：今月の重要トピックTOP5→トピック別詳細→Level別活用ポイント→来月への展望
+文章スタイル：客観的・根拠重視・初心者でもわかる・日本語
+""")
+
+    print("Step3：ChatGPT（gpt-4o）で論理チェック中...")
+    feedback_news = chatgpt_check(f"""
+以下はAI最新情報講義資料の草稿です。事実確認・論理チェックを行い改善提案を出力してください。
+{draft_news[:3000]}
+日本語で出力してください。
+""")
+
+    print("Step4：Claude（claude-sonnet-4-6）で修正・完成中...")
+    final_news = claude_revise(f"""
+以下のフィードバックを反映してAI最新情報講義資料を完成させてください。
+【フィードバック】{feedback_news}
+【草稿】{draft_news[:3000]}
+文学スキルは使わない。日本語で出力する。
+""")
+
+    word_path = os.path.join(
+        save_dir,
+        f"第{lecture_num:02d}回_①AI最新情報資料_{today}.docx"
+    )
+    save_word(
+        final_news, word_path,
+        f"第{lecture_num:02d}回 AI最新情報資料",
+        f"今月のAI最新情報＋具体的な活用方法　{today}",
+        today, lecture_num, "news"
+    )
+
+    prompts = create_image_prompts(today, "news")
+    save_image_prompts(prompts, save_dir, lecture_num, today, "news")
+
+    for name, content in [
+        ("最新情報リサーチ", news),
+        ("最新情報草稿", draft_news),
+        ("最新情報フィードバック", feedback_news),
+        ("最新情報完成版", final_news),
+    ]:
+        with open(os.path.join(save_dir, f"{name}.md"), "w") as f:
+            f.write(content)
+
+    return word_path
+
+def main():
+    import sys
+    today = datetime.now().strftime("%Y年%m月%d日")
+    lecture_num = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    month_num = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+
+    save_dir = os.path.expanduser(
+        f"~/Desktop/AI経営本部/AI活用講義/講義資料/第{lecture_num:02d}回"
+    )
+    os.makedirs(save_dir, exist_ok=True)
+
+    print("=" * 60)
+    print(f"第{lecture_num}回 講義資料制作システム起動")
+    print("3大AI完全横断：Gemini（検索・生成）× ChatGPT（論理チェック）× Claude（修正・完成）")
+    print("=" * 60)
+
+    if lecture_num == 1:
+        print("\n【第1回講義】")
+        print("ファイル①（AI最新情報）：なし（初回のため不要）")
+        print("ファイル②（Level講義資料）：生成します")
+        level_word = create_level_lecture(lecture_num, today, save_dir)
+        print(f"\n✅ 第1回講義資料完成")
+        print(f"  ファイル②：{level_word}")
+    else:
+        print(f"\n【第{lecture_num}回講義】")
+        print("ファイル①（AI最新情報）：生成します")
+        print("ファイル②（Level講義資料）：生成します")
+        news_word = create_news_lecture(lecture_num, month_num, today, save_dir)
+        level_word = create_level_lecture(lecture_num, today, save_dir)
+        print(f"\n✅ 第{lecture_num}回講義資料完成")
+        print(f"  ファイル①：{news_word}")
+        print(f"  ファイル②：{level_word}")
 
     import subprocess
     subprocess.run(["bash", "-c",
         "cd ~/Desktop/AI経営本部 && "
-        "git add AI活用講義/ && "
-        "git commit -m '第1回講義資料完成（3大AI横断・Word・画像プロンプト10枚）' && "
+        f"git add AI活用講義/講義資料/第{lecture_num:02d}回/ && "
+        f"git commit -m '第{lecture_num}回講義資料完成（3大AI横断制作・2ファイル構成）' && "
         "git push origin salesletter-development"
     ])
-
-    print("\n" + "=" * 60)
-    print("✅ 全工程完了！")
-    print("=" * 60)
-    print(f"Wordファイル：{word_file}")
-    print(f"画像プロンプト：{prompt_file}")
-    print(f"生成した画像プロンプト数：{len(image_prompts)}枚")
+    print("\n✅ GitHubプッシュ完了")
     print("\n次のステップ：")
-    print("1. ナノバナナプロ_画像プロンプト一覧.txtを開く")
-    print("2. 各プロンプトをGemini（ナノバナナプロ）に貼り付けて画像生成")
-    print("3. 生成した画像をWordの[画像挿入箇所]に挿入する")
+    print("  画像プロンプト一覧.txtをGemini（ナノバナナプロ）に貼り付けて画像生成")
+    print("  生成した画像をWordの[画像挿入箇所]に挿入する")
 
 if __name__ == "__main__":
     main()
