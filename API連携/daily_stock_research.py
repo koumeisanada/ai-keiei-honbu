@@ -67,7 +67,9 @@ def research_company(company):
 ・事実情報には情報源を明記する
 ・噂・未確認情報は「〜と報じられている」と明記
 ・新情報がない場合は「本日の新規情報なし」と明記
-・日本語で報告すること"""
+・日本語で報告すること
+・GIGAZINEの最新記事（https://gigazine.net）も確認して
+　{company}に関連する記事があればピックアップすること"""
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
