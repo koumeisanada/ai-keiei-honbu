@@ -1,2 +1,0 @@
-/bin/bash: /Users/sanadahiroaki/Desktop/AI経営本部/API連携/pipeline_daily.sh: Operation not permitted
-/bin/bash: /Users/sanadahiroaki/Desktop/AI経営本部/API連携/pipeline_daily.sh: Operation not permitted
