@@ -1,4 +1,10 @@
 #!/bin/bash
+# 環境変数の読み込み（LaunchAgent経由では.zshrcが読み込まれないため）
+source ~/.zshrc 2>/dev/null
+export GEMINI_API_KEY=$(grep GEMINI_API_KEY ~/.zshrc | cut -d'"' -f2)
+export OPENAI_API_KEY=$(grep OPENAI_API_KEY ~/.zshrc | cut -d'"' -f2)
+export ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY ~/.zshrc | cut -d'"' -f2)
+
 # ログファイル設定（cron実行時の確認用）
 LOGDIR=~/Desktop/AI経営本部/集客販売/日次成果物
 DATE=$(date +%Y%m%d)
@@ -112,6 +118,12 @@ echo ""
 echo "【グローバルAI講座調査実行中...】"
 python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/global_ai_research.py
 echo "✅ グローバル調査完了"
+echo ""
+
+echo "【米国企業リサーチ実行中...（Gemini使用）】"
+echo "米国企業リサーチ開始..."
+python3 ~/Desktop/AI経営本部/API連携/daily_stock_research.py
+echo "✅ 米国企業リサーチ完了"
 echo ""
 
 echo "【Step5】品質チェック中...（Claude使用）"

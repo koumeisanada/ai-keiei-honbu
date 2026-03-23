@@ -16,7 +16,7 @@ def load_past_research(company, days=7):
     save_dir = os.path.expanduser(
         "~/Desktop/AI経営本部/北の株式投資大学/資料/デイリーリサーチ"
     )
-    files = sorted(glob.glob(f"{save_dir}/*_米国成長株リサーチ.md"), reverse=True)
+    files = sorted(glob.glob(f"{save_dir}/*_米国企業リサーチ.md") + glob.glob(f"{save_dir}/*_米国成長株リサーチ.md"), reverse=True)
     past_content = []
     for f in files[:days]:
         with open(f, "r") as fp:
@@ -48,6 +48,8 @@ def research_company(company):
 
 {company}の「5年〜10年先の成長性」に関わる【本日の新着情報のみ】を
 米国の主要テクノロジーメディアから調査してください。
+対象企業：NVIDIA・Apple・Microsoft・Netflix・Alphabet（Google）・
+Meta・Amazon・Tesla・TSMCの9社の最新情報・業績・AI戦略・経営動向を収集する。
 
 調査期間：{today_str}から遡って7日以内の情報のみ
 それ以外の情報は「情報なし」と記載すること
@@ -59,10 +61,10 @@ def research_company(company):
 2. 戦略的提携・M&A・投資の新着情報
 3. AI・次世代技術の新着発表
 4. CEO・幹部の新着発言・ビジョン
-5. 業界トレンドの新着変化
+5. 企業情報・経営動向の新着変化
 
 【重要ルール】
-・株価・決算数字は不要
+・株価は不要（企業の経営動向・AI戦略・業績に関する情報を重視）
 ・過去調査済みの情報は絶対に繰り返さない
 ・事実情報には情報源を明記する
 ・噂・未確認情報は「〜と報じられている」と明記
@@ -89,10 +91,11 @@ def main():
     )
     os.makedirs(save_dir, exist_ok=True)
 
-    output_file = f"{save_dir}/{date_str}_米国成長株リサーチ.md"
+    output_file = f"{save_dir}/{date_str}_米国企業リサーチ.md"
 
-    content = "# 米国成長株 最新動向リサーチ\n"
+    content = "# 米国企業リサーチ 最新動向\n"
     content += f"**調査日：{today}**\n"
+    content += "**対象：NVIDIA・Apple・Microsoft・Netflix・Alphabet・Meta・Amazon・Tesla・TSMCの9社**\n"
     content += "**テーマ：5〜10年先の成長性に関わる新着情報のみ（重複除外）**\n\n"
     content += "---\n\n"
 
@@ -106,10 +109,10 @@ def main():
     content += "## 本日の注目トレンド総括\n\n"
 
     summary_prompt = """9社（NVIDIA・Apple・Microsoft・Netflix・Alphabet・Meta・Amazon・Tesla・TSMC）の
-本日の新着調査結果を踏まえて、
+本日の新着企業リサーチ結果を踏まえて、
 5〜10年先の米国テクノロジー業界で特に注目すべき新着ポイントを
 3〜5つ日本語でまとめてください。
-長期投資家の視点で総括してください。"""
+企業研究・経営動向・AI戦略の視点で総括してください。"""
 
     summary = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -124,7 +127,7 @@ def main():
         f.write(content)
 
     print(f"✅ 保存完了：{output_file}")
-    print(f"✅ 対象9社の新着情報リサーチ完了")
+    print(f"✅ 対象9社の新着企業リサーチ完了")
     print(f"✅ 過去7日間の重複情報を自動除外済み")
 
 if __name__ == "__main__":
