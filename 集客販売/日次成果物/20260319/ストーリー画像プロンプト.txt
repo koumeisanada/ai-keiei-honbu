@@ -1,0 +1,44 @@
+# Instagramストーリー画像プロンプト
+
+**テーマ：日本の物価高 × 5億円資産形成ロードマップ**
+
+---
+
+## 画像生成プロンプト
+
+```
+A cinematic, high-contrast Instagram story image (9:16 aspect ratio).
+Dark navy blue gradient background with subtle golden light rays
+breaking through from the upper right corner. In the center,
+a photorealistic Japanese supermarket receipt floating and
+slightly crumpled, with prices visibly crossed out and replaced
+by higher numbers in red ink. Behind the receipt, a faint
+upward-trending golden stock chart line ascends sharply toward
+the top right. At the bottom, a silhouette of a Japanese
+businessman in a suit standing with his family (wife and two
+children) looking up at the golden light. The overall mood is
+urgent yet hopeful — crisis turning into opportunity. Minimal
+text space reserved at top and bottom. Cinematic lighting,
+shallow depth of field, editorial magazine quality. Color palette:
+deep navy, black, gold, and accent red.
+```
+
+---
+
+## オーバーレイテキスト案（画像上に配置）
+
+| 位置 | テキスト |
+|------|----------|
+| 上部（白・太字） | **物価高は、もう止まらない。** |
+| 中央（ゴールド・大文字） | **5億円ロードマップ** |
+| 下部（白・小文字） | 40代サラリーマンが今やるべき唯一の戦略 → |
+| 最下部CTA | **スワイプして読む ▶** |
+
+---
+
+## スタイル補足（ゼータスタイル要素）
+
+- **色調**：ダークネイビー × ゴールドで「危機感＋高級感」を両立
+- **構図**：レシート（日常の痛み）→ 株価チャート（解決策）→ 家族のシルエット（守るべきもの）の視線誘導
+- **フォント指定**：見出しはゴシック体（極太）、サブテキストは明朝体で権威性を演出
+- **CTA**：スワイプ導線を明確にし、メルマガ本文への遷移率を最大化
