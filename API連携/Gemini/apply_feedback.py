@@ -12,8 +12,12 @@ def get_latest_feedback():
     for folder in folders:
         feedback_file = os.path.join(folder, "品質チェック結果.txt")
         if os.path.exists(feedback_file):
-            with open(feedback_file, "r") as f:
-                return f.read()
+            try:
+                with open(feedback_file, "r") as f:
+                    return f.read()
+            except OSError as e:
+                print(f"⚠️ フィードバック読み込みスキップ: {feedback_file} ({e})")
+                continue
     return None
 
 def apply_feedback_to_skill(feedback):

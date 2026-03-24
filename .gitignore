@@ -20,3 +20,10 @@
 # 一時ファイル
 ~$*
 *.tmp
+
+# パイプラインログ
+API連携/pipeline_log.txt
+API連携/pipeline_error.txt
+
+# 日次成果物（自動生成）
+集客販売/日次成果物/

@@ -36,6 +36,12 @@ LINEステップメール用に900〜1000文字でリライトしてください
     return "\n".join(results)
 
 if __name__ == "__main__":
-    merumaga_text = sys.argv[1] if len(sys.argv) > 1 else ""
+    arg = sys.argv[1] if len(sys.argv) > 1 else ""
+    # ファイルパスが渡された場合はファイルから読み込む
+    if os.path.isfile(arg):
+        with open(arg, "r") as f:
+            merumaga_text = f.read()
+    else:
+        merumaga_text = arg
     result = generate_line_4days(merumaga_text)
     print(result)

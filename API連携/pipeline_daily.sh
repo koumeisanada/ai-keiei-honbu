@@ -85,12 +85,12 @@ echo "✅ AI最新情報収集完了"
 echo ""
 
 echo "【Step2】LINE4日分を生成中...（Gemini使用）"
-python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_line_4days.py "$(cat ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt)" > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/LINE4日分.txt
+python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_line_4days.py ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/LINE4日分.txt
 echo "✅ LINE4日分完了"
 echo ""
 
 echo "【Step3】リール動画原稿を生成中...（Gemini使用）"
-python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_reel.py "$(cat ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt)" > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/リール動画原稿.txt
+python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_reel.py ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/リール動画原稿.txt
 echo "✅ リール動画原稿完了"
 echo ""
 

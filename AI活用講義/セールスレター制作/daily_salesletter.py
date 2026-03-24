@@ -99,8 +99,12 @@ def get_past_data():
         if os.path.exists(folder_path):
             import glob
             for f in sorted(glob.glob(f"{folder_path}/*.md"))[-3:]:
-                with open(f, "r") as fp:
-                    past.append(fp.read()[:500])
+                try:
+                    with open(f, "r") as fp:
+                        past.append(fp.read()[:500])
+                except OSError as e:
+                    print(f"⚠️ ファイル読み込みスキップ: {f} ({e})")
+                    continue
     return "\n\n---\n\n".join(past[-6:]) if past else ""
 
 def run_daily_task():
