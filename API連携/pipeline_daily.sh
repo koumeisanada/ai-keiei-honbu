@@ -120,6 +120,11 @@ python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/glob
 echo "✅ グローバル調査完了"
 echo ""
 
+echo "ケイタ式 eBayリサーチ実行中..."
+python3 ~/Desktop/AI経営本部/物販ビジネス/ケイタ式/自動化スクリプト/ebay_japan_research.py
+echo "✅ ケイタ式 eBayリサーチ完了"
+echo ""
+
 echo "【米国企業リサーチ実行中...（Gemini使用）】"
 echo "米国企業リサーチ開始..."
 python3 ~/Desktop/AI経営本部/API連携/daily_stock_research.py
