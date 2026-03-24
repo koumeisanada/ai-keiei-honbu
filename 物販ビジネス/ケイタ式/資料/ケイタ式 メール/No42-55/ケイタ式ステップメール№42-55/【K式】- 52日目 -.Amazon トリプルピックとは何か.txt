@@ -1,0 +1,183 @@
+タイトル　【K式】- 52日目 -.Amazon トリプルピックとは何か
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+『K式海外貿易事業』- 52日目 -.Amazon トリプルピックとは何か
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+こんにちは
+ケイタです。
+
+
+販売開始したての初期ユーザーに対して、
+通称トリプルピック（ランダムピック）といって、
+アカウントを一時停止されることがあります。
+
+
+これは無在庫の商品登録によらず、
+FBAに納品するために
+商品登録しただけでも来ることがありますので、
+商品登録には最大限の注意が必要です。
+
+
+以下のようなメールが届きます。
+
+
+＜原文＞
+
+Hi,
+
+Your Amazon Seller account has been temporarily deactivated and your listings have been removed. Funds will not be transferred to you but will be held in your account while we work with you to address the following concern(s).
+
+■Why is this happening?
+
+In accordance with Section 3 of Amazon’s Business Solutions Agreement, your account has been deactivated because you are offering items that may be inauthentic. A list of these items is provided at the end of this email.
+
+In order to ensure that customers can shop with confidence on Amazon, we routinely request additional documentation from sellers to verify their account information and confirm authenticity of certain items.
+
+The sale of counterfeit products on Amazon is strictly prohibited. You can learn more about Amazon’s policies regarding the sale of counterfeit items in Seller Central Help:
+
+　・Amazon Anti-Counterfeiting Policy (https://sellercentral.amazon.com/gp/help/201165970)
+　・Policies and Agreements (https://sellercentral.amazon.com/gp/help/521)
+　・Amazon Services Business Solutions Agreement (https://sellercentral.amazon.com/gp/help/1791)
+
+■How do I reactivate my account?
+
+To reactivate your selling account, please send us the following information for the ASINs listed at the end of this email:
+
+1.Copies of invoices, receipts, contracts, delivery orders, or authorization letters from your supplier issued in the last 365 days. The quantity of items shown should match your inventory.
+
+2.If you are not the brand owner, provide an authorization letter and a complete set of documentation, including authorization letters, to prove a valid supply chain.
+
+3.If you are the brand owner, provide a copy of the brand registration certificate, and business license or personal identity card.
+
+4.Contact information for your supplier, including name, phone number, address, email, and website.
+You can only send .pdf, .jpg, .png, or .gif files. These documents must be authentic and unaltered. We may call your supplier to verify the documents. We will maintain the confidentiality of your supplier contact information.
+
+You may remove pricing information, but the rest of the document must be visible. For ease of our review, you may highlight or circle the ASIN(s) under review.
+
+
+■How do I send the required information?
+
+Please submit this information by clicking the Appeal button next to this message on the Performance Notifications page in Seller Central (https://sellercentral.amazon.com/gp/customer-experience/perf-notifications.html).
+
+
+■What happens if I do not send the requested information?
+
+If we do not receive the requested information within 17 days, or after two unsuccessful appeals (whichever occurs sooner), your account will be permanently deactivated. Failure to successfully appeal this decision may result in us permanently withholding any payments to you.
+
+You can see your balance and settlement information in the Payments section of Seller Central. If you have questions about those, please write to payments-funds@amazon.com
+
+We're here to help
+-----------------------------
+
+You can get help creating your plan in Seller Central Help (https://sellercentral.amazon.com/gp/help/200370560).
+
+You can view your account’s performance at (https://sellercentral.amazon.com/performance/dashboard?ref=ah_em_pq) or select Account Health on the home screen of the Amazon Seller app on your iOS (https://itunes.apple.com/us/app/amazon-Seller/id794141485) or Android (https://play.google.com/store/apps/details?id=com.amazon.sellermobile.android&hl...) device. The Account Health dashboard shows how well your account is performing against the performance metrics and policies required to sell on Amazon.
+
+-------------------------------------
+ASIN: B000BNCBB2
+Brand: Pigeon
+Title: Pigeon Teethwipe 42ea
+-------------------------------------
+ASIN: B001DHJK14
+Brand: Maruman
+Title: Maruman Section Line Croquis Pad 11.5x8"
+-------------------------------------
+ASIN: B001O78DT8
+Brand: §ANEX
+Title: 4259B
+-------------------------------------
+
+
+＜日本語＞
+
+
+こんにちは、
+
+Amazonセラーアカウントが一時的に無効になり、あなたの出品は削除されました。資金はあなたに送金されませんが、私たちがあなたと協力して以下の懸念に対処する間、あなたの口座に保持されます。
+
+■なぜこれが起こっているのですか？
+
+Amazonのビジネスソリューション契約のセクション3に従い、信頼できないアイテムを提供しているため、アカウントが無効になりました。これらのアイテムのリストは、このメールの最後に記載されています。
+
+顧客がAmazonで安心して買い物をできるようにするために、アカウント情報を確認し、特定の商品の信頼性を確認するために、販売者に追加のドキュメントを定期的にリクエストします。
+
+アマゾンでの偽造品の販売は固く禁じられています。偽造品の販売に関するAmazonのポリシーの詳細については、セラーセントラルヘルプをご覧ください。
+
+・Amazon偽造防止ポリシー（https://sellercentral.amazon.com/gp/help/201165970）
+・ポリシーと契約（https://sellercentral.amazon.com/gp/help/521）
+・Amazonサービスビジネスソリューション契約（https://sellercentral.amazon.com/gp/help/1791）
+
+
+■アカウントを再開するにはどうすればいいですか？
+
+販売アカウントを再開するには、このメールの最後に記載されているASINに関する次の情報を送信してください。
+
+
+1.過去365日間に発行された仕入先からの請求書、領収書、契約書、配達注文書、または承認書のコピー。表示されるアイテムの数量は、在庫と一致する必要があります。
+
+2.ブランドオーナーでない場合は、有効なサプライチェーンを証明するために、承認レターと、承認レターを含むドキュメント一式を提供してください。
+
+3.あなたがブランド所有者である場合は、ブランド登録証明書のコピーと、ビジネスライセンスまたは個人識別カードを提供してください。
+
+4.名前、電話番号、住所、電子メール、Webサイトなど、サプライヤーの連絡先情報。
+
+
+価格情報は削除できますが、ドキュメントの残りの部分は表示されている必要があります。レビューを簡単にするために、レビュー中のASINをハイライト表示または丸で囲んでください。
+
+
+■必要な情報を送るには？
+
+セラーセントラルのパフォーマンス通知ページ（https://sellercentral.amazon.com/gp/customer-experience/perf-notifications.html）でこのメッセージの横にある[申し立て]ボタンをクリックして、この情報を送信してください。
+
+
+■必要な情報を送らないとどうなりますか？
+
+17日以内に要求された情報が届かない場合、または2つの異議申し立てに失敗した後（いずれか早い方）、アカウントは完全に無効になります。この決定に対する異議申し立てに失敗した場合、当社はお客様への支払いを永久に保留する可能性があります。
+
+残高と決済情報はセラーセントラルの支払いセクションで確認できます。これらについて質問がある場合は、payments-funds @ amazon.comまでご連絡ください。
+
+
+私たちがお手伝いします
+-----------------------------
+
+プランの作成に関するヘルプは、セラーセントラルヘルプ（https://sellercentral.amazon.com/gp/help/200370560）で入手できます。
+
+アカウントのパフォーマンスは（https://sellercentral.amazon.com/performance/dashboard?ref=ah_em_pq）で確認できます。または、iOSのAmazon Sellerアプリのホーム画面（https://itunes.apple .com / us / app / amazon-Seller / id794141485）またはAndroid（https：//play.google.com/store/apps/details？id = com.amazon.sellermobile.android＆hl ...）デバイス。アカウントの健全性ダッシュボードは、Amazonでの販売に必要なパフォーマンスメトリックとポリシーに対して、アカウントのパフォーマンスを示します。
+
+
+＜以上＞
+
+
+
+17日以内などと期限が指定されている場合がありますので、
+期限内の対応が必須です。
+
+
+・どうしてトリプルピックの対象となるのか？
+
+・トリプルピックの対象にならないようにするにはどうすればよいのか？
+
+・対象になってしまった場合どうすればよいのか？
+
+
+次から解説していきたいと思います。
+
+
+　　　　　　　　　　　ケイタ
+
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ケイタへの質問　連絡先（メール）
+keitaec@gmail.com
+
+北の物販倶楽部　運営事務局　連絡先（メール）
+info@kitasociety.com
+
+北の物販倶楽部　運営事務局　連絡先（LINE）
+https://kitasociety.com/lp/line-support/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
