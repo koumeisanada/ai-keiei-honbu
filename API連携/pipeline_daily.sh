@@ -1,9 +1,9 @@
 #!/bin/bash
 # 環境変数の読み込み（LaunchAgent経由では.zshrcが読み込まれないため）
 source ~/.zshrc 2>/dev/null
-export GEMINI_API_KEY=$(grep GEMINI_API_KEY ~/.zshrc | cut -d'"' -f2)
-export OPENAI_API_KEY=$(grep OPENAI_API_KEY ~/.zshrc | cut -d'"' -f2)
-export ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY ~/.zshrc | cut -d'"' -f2)
+export GEMINI_API_KEY=$(grep GEMINI_API_KEY ~/.zshrc | head -1 | sed 's/.*=//')
+export OPENAI_API_KEY=$(grep OPENAI_API_KEY ~/.zshrc | head -1 | sed 's/.*=//')
+export ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY ~/.zshrc | head -1 | sed 's/.*=//')
 
 # ログファイル設定（cron実行時の確認用）
 LOGDIR=~/Desktop/AI経営本部/集客販売/日次成果物
@@ -157,3 +157,7 @@ echo "================================================"
 echo ""
 echo "【本日のアウトプット確認レポート】"
 bash ~/Desktop/AI経営本部/API連携/check_progress.sh
+
+echo "引き継ぎマスターを更新中..."
+sed -i '' "s/# 最終更新：.*/# 最終更新：$(date '+%Y年%m月%d日')/" ~/Desktop/AI経営本部/SKILL_引き継ぎマスター.md
+echo "✅ 引き継ぎマスター更新完了"
