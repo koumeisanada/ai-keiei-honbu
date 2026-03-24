@@ -1,0 +1,109 @@
+================================================
+  真田孔明AI経営本部 デイリーパイプライン
+  実行時刻：2026-03-24 06:00:00
+================================================
+
+テーマ（ファイルから取得）：今日の最新ニュースから40代サラリーマンに刺さるテーマを選んで
+
+【前日の品質チェック結果を反映中...】
+✅ 前日のフィードバック反映完了
+
+【Step1】メルマガを生成中...（Gemini使用）
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+メルマガを生成中...
+✅ メルマガ完了
+
+AI最新情報を収集中...
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+Traceback (most recent call last):
+  File "/Users/sanadahiroaki/Desktop/AI経営本部/API連携/Gemini/generate_ai_news.py", line 6, in <module>
+    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+  File "/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/genai/client.py", line 265, in __init__
+    self._api_client = self._get_api_client(
+  File "/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/genai/client.py", line 311, in _get_api_client
+    return BaseApiClient(
+  File "/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/genai/_api_client.py", line 676, in __init__
+    raise ValueError(
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+✅ AI最新情報収集完了
+
+【Step2】LINE4日分を生成中...（Gemini使用）
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+✅ LINE4日分完了
+
+【Step3】リール動画原稿を生成中...（Gemini使用）
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+✅ リール動画原稿完了
+
+【Step4】ストーリー画像プロンプトを生成中...
+✅ ストーリー画像プロンプト完了
+
+【競合分析実行中...（週1回）】
+（競合分析は毎週月曜日に自動実行）
+
+【セールスレター制作 本日のタスク実行中...】
+午前・午後の2回実行します
+✅ セールスレタータスク完了
+
+【グローバルAI講座調査実行中...】
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+Traceback (most recent call last):
+  File "/Users/sanadahiroaki/Desktop/AI経営本部/AI活用講義/セールスレター制作/global_ai_research.py", line 7, in <module>
+    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+  File "/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/genai/client.py", line 265, in __init__
+    self._api_client = self._get_api_client(
+  File "/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/genai/client.py", line 311, in _get_api_client
+    return BaseApiClient(
+  File "/Users/sanadahiroaki/Library/Python/3.9/lib/python/site-packages/google/genai/_api_client.py", line 676, in __init__
+    raise ValueError(
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+✅ グローバル調査完了
+
+【Step5】品質チェック中...（Claude使用）
+✅ 品質チェック完了
+
+================================================
+  本日の成果物が完成しました！
+================================================
+
+保存先：Desktop/AI経営本部/集客販売/日次成果物/20260324/
+
+✅ メルマガ.txt（約4,000文字）
+✅ LINE4日分.txt（各900〜1000文字）
+✅ リール動画原稿.txt（200〜250文字）
+✅ ストーリー画像プロンプト.txt
+✅ 品質チェック結果.txt
+
+次のステップ：
+1. ストーリー画像プロンプト.txtを開く
+2. Gemini（ナノバナナプロ）に貼り付けて画像生成
+3. 各媒体に投稿！
+================================================
+
+【本日のアウトプット確認レポート】
+/Users/sanadahiroaki/Desktop/AI経営本部/API連携/check_progress.sh: /Users/sanadahiroaki/Desktop/AI経営本部/API連携/check_progress.sh: Resource deadlock avoided
