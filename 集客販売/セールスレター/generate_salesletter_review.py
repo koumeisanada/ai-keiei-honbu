@@ -149,7 +149,7 @@ def run_finish(skill: str, draft: str) -> str:
 """
     msg = client.messages.create(
         model=MODEL,
-        max_tokens=8000,
+        max_tokens=16000,
         system=build_system_prompt(skill),
         messages=[{"role": "user", "content": prompt}]
     )
