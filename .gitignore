@@ -27,3 +27,6 @@ API連携/pipeline_error.txt
 
 # 日次成果物（自動生成）
 集客販売/日次成果物/
+
+.env
+API連携/.env
