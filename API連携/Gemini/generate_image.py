@@ -4,7 +4,7 @@ import os
 import sys
 from datetime import datetime
 
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "AIzaSyDk3qZznYlKsX6lmMUMjGrNcsqf9lrTOsI"))
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "AIzaSyDbqTbFwFz_fVaY0mkQIWA0ciD0iOgrD88"))
 
 def generate_image(prompt, output_folder, filename):
     response = client.models.generate_images(

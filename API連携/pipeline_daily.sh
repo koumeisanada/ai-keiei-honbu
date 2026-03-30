@@ -161,3 +161,7 @@ bash ~/Desktop/AI経営本部/API連携/check_progress.sh
 echo "引き継ぎマスターを更新中..."
 sed -i '' "s/# 最終更新：.*/# 最終更新：$(date '+%Y年%m月%d日')/" ~/Desktop/AI経営本部/SKILL_引き継ぎマスター.md
 echo "✅ 引き継ぎマスター更新完了"
+
+# Discord AIノウハウ自動投稿
+echo '=== Discord Tips投稿 ==='
+/usr/bin/python3 /Users/sanadahiroaki/Desktop/AI経営本部/API連携/discord_daily_tips.py

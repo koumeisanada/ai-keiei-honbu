@@ -354,7 +354,7 @@ bar_cell2 = t_bar2.cell(0, 0)
 set_cell_shading(bar_cell2, C_PURPLE)
 p_bar2 = bar_cell2.paragraphs[0]
 p_bar2.alignment = WD_ALIGN_PARAGRAPH.CENTER
-add_run(p_bar2, f"調査日：2026年3月23日  |  AI活用講義 月額制サブスクリプション", size=Pt(10), color=RC_WHITE)
+add_run(p_bar2, f"調査日：2026年3月26日（更新版）  |  AI活用講義 月額制サブスクリプション", size=Pt(10), color=RC_WHITE)
 
 doc.add_paragraph()
 

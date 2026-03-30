@@ -3,7 +3,7 @@ import os
 import glob
 from datetime import datetime
 
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "AIzaSyDk3qZznYlKsX6lmMUMjGrNcsqf9lrTOsI"))
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "AIzaSyDbqTbFwFz_fVaY0mkQIWA0ciD0iOgrD88"))
 
 def get_latest_feedback():
     base = os.path.expanduser("~/Desktop/AI経営本部/集客販売/日次成果物")
