@@ -6,7 +6,7 @@ from discord_tips_library import get_today_tip
 
 def main():
     tip, idx = get_today_tip()
-    print("Discord投稿: AIノウハウ Tips #%%d" %% (idx+1))
+    print("Discord投稿: AIノウハウ Tips #%d" % idx)
     post_to_discord(tip)
 
 if __name__ == "__main__":
