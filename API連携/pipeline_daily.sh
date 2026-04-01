@@ -164,4 +164,5 @@ echo "✅ 引き継ぎマスター更新完了"
 
 # Discord AIノウハウ自動投稿
 echo '=== Discord Tips投稿 ==='
-/usr/bin/python3 /Users/sanadahiroaki/Desktop/AI経営本部/API連携/discord_daily_tips.py
+# [独立LaunchAgent移行済み] discord_daily_tips は毎朝6:10に独立実行
+# /usr/bin/python3 /Users/sanadahiroaki/Desktop/AI経営本部/API連携/discord_daily_tips.py
