@@ -787,16 +787,32 @@ AIエージェントは自分でタスクを計画し、複数ツールを使い
 #AI最新情報 #レベルファイブAI経営マスタリー"""
 ]
 
+import json
 from datetime import date
+from pathlib import Path
+
+COUNTER_PATH = Path.home() / "Desktop/AI経営本部/API連携/discord_tips_counter.json"
 
 def get_today_tip():
-    base_date = date(2026, 4, 1)
-    today = date.today()
-    days = (today - base_date).days
-    if days < 0:
-        days = 0
-    index = days % len(TIPS)
-    return TIPS[index], index + 1
+    today_str = str(date.today())
+    if COUNTER_PATH.exists():
+        data = json.load(open(COUNTER_PATH))
+    else:
+        data = {"last_posted": 0, "last_date": ""}
+    # 今日すでに投稿済みなら同じTipsを返す
+    if data.get("last_date") == today_str:
+        index = (data["last_posted"] - 1) % len(TIPS)
+        return TIPS[index], data["last_posted"]
+    # 次のTipsに進む
+    next_num = data["last_posted"] + 1
+    if next_num > len(TIPS):
+        next_num = 1
+    index = (next_num - 1) % len(TIPS)
+    data["last_posted"] = next_num
+    data["last_date"] = today_str
+    with open(COUNTER_PATH, "w") as f:
+        json.dump(data, f)
+    return TIPS[index], next_num
 
 if __name__ == "__main__":
     tip, num = get_today_tip()
