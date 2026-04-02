@@ -162,10 +162,5 @@ echo "引き継ぎマスターを更新中..."
 sed -i '' "s/# 最終更新：.*/# 最終更新：$(date '+%Y年%m月%d日')/" ~/Desktop/AI経営本部/SKILL_引き継ぎマスター.md
 echo "✅ 引き継ぎマスター更新完了"
 
-# Discord AIノウハウ自動投稿
-echo '=== Discord Tips投稿 ==='
-# [独立LaunchAgent移行済み] discord_daily_tips は毎朝6:10に独立実行
-# /usr/bin/python3 /Users/sanadahiroaki/Desktop/AI経営本部/API連携/discord_daily_tips.py
-
-# 強化版米国株リサーチ（セミナー向け・出典付き・重複排除）
-python3 ~/Desktop/AI経営本部/API連携/research_us_stocks_enhanced.py
+# LINEステップメール連動型メルマガ生成
+python3 ~/Desktop/AI経営本部/API連携/generate_merumaga_from_line.py

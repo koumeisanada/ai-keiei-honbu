@@ -27,13 +27,6 @@ API連携/pipeline_error.txt
 
 # 日次成果物（自動生成）
 集客販売/日次成果物/
-
-.env
 API連携/.env
-
-# APIキー保護
-*.plist
-.env.*
-!.env.example
-research_history.json
-secrets.*
+API連携/discord_bot.log
+API連携/discord_bot_error.log

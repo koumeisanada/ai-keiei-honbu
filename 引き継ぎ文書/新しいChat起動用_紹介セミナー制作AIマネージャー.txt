@@ -341,3 +341,33 @@ Qフェーズ（絞り込み）の「労働市場ヒエラルキー」直前に
 - ※「ポケモン」固有名詞は書面NG、口頭比喩はOK
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【WEBサイト更新の正しい手順】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 重要：ブランチとファイルの場所
+
+- 公開ブランチ：salesletter-development
+- index.htmlの場所：~/Desktop/AI経営本部/index.html
+- 最新セールスレター原稿：salesletter-developmentブランチの
+  AI活用講義/セールスレター制作/09_最終完成/
+
+■ Webサイトを更新する手順（ワンプッシュ）
+
+1. index.htmlを編集（テキストエディタで開く）
+2. 以下のコマンド1行を実行：
+
+cd ~/Desktop/AI経営本部 && git checkout salesletter-development && git add index.html && git commit -m "update" && git push origin salesletter-development
+
+■ 最新セールスレター原稿を見る
+
+cd ~/Desktop/AI経営本部 && git checkout salesletter-development && open AI活用講義/セールスレター制作/09_最終完成/
+
+■ 注意事項
+- mainブランチにプッシュしても公開されない
+- 公開されるのはsalesletter-developmentブランチのみ
+- index.htmlはsalesletter-developmentブランチのルートに置く
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
