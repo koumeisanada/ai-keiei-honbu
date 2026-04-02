@@ -6,3 +6,4 @@
 [2026-04-02 12:45:36] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 22c0f8ac5a026fda51fa39beb958224a).
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/sanadahiroaki/Desktop/AI経営本部/API連携/discord_bot_responder.py': [Errno 1] Operation not permitted
 [2026-04-02 12:58:49] [INFO    ] discord.client: logging in using static token
+[2026-04-02 12:58:50] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: b3db5169b1bccf6e0720bbbc77057a84).
