@@ -161,3 +161,6 @@ bash ~/Desktop/AI経営本部/API連携/check_progress.sh
 echo "引き継ぎマスターを更新中..."
 sed -i '' "s/# 最終更新：.*/# 最終更新：$(date '+%Y年%m月%d日')/" ~/Desktop/AI経営本部/SKILL_引き継ぎマスター.md
 echo "✅ 引き継ぎマスター更新完了"
+
+# LINEステップメール連動型メルマガ生成
+python3 ~/Desktop/AI経営本部/API連携/generate_merumaga_from_line.py
