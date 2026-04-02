@@ -7,3 +7,7 @@
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/sanadahiroaki/Desktop/AI経営本部/API連携/discord_bot_responder.py': [Errno 1] Operation not permitted
 [2026-04-02 12:58:49] [INFO    ] discord.client: logging in using static token
 [2026-04-02 12:58:50] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: b3db5169b1bccf6e0720bbbc77057a84).
+[2026-04-02 14:02:49] [INFO    ] discord.client: logging in using static token
+[2026-04-02 14:02:50] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: dcdc61498aebdae170e25c908ae477e7).
+[2026-04-02 14:53:34] [INFO    ] discord.client: logging in using static token
+[2026-04-02 14:53:36] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: db13e9a5913b4129ffb31ef368b37843).

@@ -49,7 +49,7 @@ def research_with_gemini(company):
         import google.genai as genai
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", ""))
         prompt = "直近7日以内の「%s（%s）」に関する最新情報。テーマ：%s。出典（メディア名・日付）を必ず明記。カテゴリ別（決算/製品/経営陣発言/アナリスト評価/競合動向/規制リスク）で分類。各情報に投資家への示唆を付記。" % (company["name"], company["ticker"], company["theme"])
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         return response.text
     except Exception as e:
         return "Geminiエラー：%s" % e
