@@ -30,3 +30,10 @@ API連携/pipeline_error.txt
 
 .env
 API連携/.env
+
+# APIキー保護
+*.plist
+.env.*
+!.env.example
+research_history.json
+secrets.*

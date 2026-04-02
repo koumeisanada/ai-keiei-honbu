@@ -2,7 +2,7 @@ from google import genai
 import os
 import sys
 
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "AIzaSyDbqTbFwFz_fVaY0mkQIWA0ciD0iOgrD88"))
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY", "")))
 
 def generate_reel(merumaga_text):
     prompt = f"""あなたは真田孔明（Instagram名：ゼータ）です。

@@ -2,7 +2,7 @@ from google import genai
 import os
 import sys
 
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "AIzaSyDbqTbFwFz_fVaY0mkQIWA0ciD0iOgrD88"))
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY", "")))
 
 def generate_line_4days(merumaga_text):
     parts = ["序論（問題提起）", "本論①（意見提示）", "本論②（論拠提示）", "結論＆CTA"]
