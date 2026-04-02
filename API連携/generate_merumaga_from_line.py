@@ -69,6 +69,7 @@ def generate_merumaga(line_content, phase, number, ai_news):
 %s
 
 【執筆ルール】
+・最初の1行目に「件名：」としてメルマガ全体のタイトルを書く（読者が開封したくなる件名）
 ・LINEの内容を4倍に展開する
 ・AI最新情報は「地合い」として自然に1〜2回触れる
 ・一人称：僕 / です・ます調 / 「あなた」への手紙
@@ -77,8 +78,11 @@ def generate_merumaga(line_content, phase, number, ai_news):
 ・段落：2〜4行で改行
 ・見出し：◯タイトル
 ・末尾署名：全角スペース12個＋真田孔明
+・各セクションを必ず1,000字前後で書くこと。合計4,000字が目標
 
-【4セクション構成】
+【出力形式（この順番で出力すること）】
+件名：（メルマガの件名・読者が開封したくなるタイトル）
+
 ◯[序論タイトル]（約1,000字）
 ◯[本論①タイトル]（約1,000字）
 ◯[本論②タイトル]（約1,000字）
@@ -115,23 +119,38 @@ def main():
     merumaga = generate_merumaga(line_content, phase, number, ai_news)
     print("  ✅ メルマガ執筆完了（%d字）" % len(merumaga))
 
+    # タイトル抽出（「件名：」の行を探す）
+    title = ""
+    body = merumaga
+    for line in merumaga.split("\n"):
+        if line.startswith("件名：") or line.startswith("件名:"):
+            title = line.replace("件名：", "").replace("件名:", "").strip()
+            body = merumaga.replace(line, "", 1).strip()
+            break
+    if title:
+        print("  📌 件名：%s" % title)
+
     # TXT保存
     labels = {"P": "プロローグ", "Q": "絞り込み", "U": "共感", "E": "教育", "S": "刺激", "T": "行動促進"}
     txt_name = "メルマガ_%s_%s-%02d.txt" % (today, phase, number)
     txt_path = os.path.join(OUTPUT_DIR, txt_name)
     with open(txt_path, "w", encoding="utf-8") as f:
+        if title:
+            f.write("件名：%s\n\n" % title)
         f.write("レベルファイブ AI経営マスタリー メルマガ\n")
         f.write("%s %s-%02d | %s\n\n" % (labels.get(phase, phase), phase, number, today))
-        f.write(merumaga)
+        f.write(body)
     print("  ✅ TXT保存：%s" % txt_name)
 
     # MD保存
     md_name = txt_name.replace(".txt", ".md")
     md_path = os.path.join(OUTPUT_DIR, md_name)
     with open(md_path, "w", encoding="utf-8") as f:
-        f.write("# レベルファイブ AI経営マスタリー メルマガ\n")
-        f.write("## %s %s-%02d | %s\n\n" % (labels.get(phase, phase), phase, number, today))
-        f.write(merumaga)
+        if title:
+            f.write("# 件名：%s\n\n" % title)
+        f.write("## レベルファイブ AI経営マスタリー メルマガ\n")
+        f.write("### %s %s-%02d | %s\n\n" % (labels.get(phase, phase), phase, number, today))
+        f.write(body)
     print("  ✅ MD保存：%s" % md_name)
 
     # 進捗更新
