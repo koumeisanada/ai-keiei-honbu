@@ -1,9 +1,9 @@
 #!/bin/bash
 # 環境変数の読み込み（LaunchAgent経由では.zshrcが読み込まれないため）
 source ~/.zshrc 2>/dev/null
-export GEMINI_API_KEY=$(grep GEMINI_API_KEY ~/.zshrc | head -1 | sed 's/.*=//')
-export OPENAI_API_KEY=$(grep OPENAI_API_KEY ~/.zshrc | head -1 | sed 's/.*=//')
-export ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY ~/.zshrc | head -1 | sed 's/.*=//')
+export GEMINI_API_KEY=$(grep GEMINI_API_KEY ~/.zshrc | head -1 | sed 's/.*=//' | tr -d '"')
+export OPENAI_API_KEY=$(grep OPENAI_API_KEY ~/.zshrc | head -1 | sed 's/.*=//' | tr -d '"')
+export ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY ~/.zshrc | head -1 | sed 's/.*=//' | tr -d '"')
 
 # ログファイル設定（cron実行時の確認用）
 LOGDIR=~/Desktop/AI経営本部/集客販売/日次成果物
