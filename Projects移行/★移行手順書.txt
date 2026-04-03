@@ -1,0 +1,7 @@
+★ Claude Projects 移行手順書
+STEP1: claude.aiでProjects8つ作成（AI本部アイム/Ω説明会SL/Ω書籍/Ωメルマガ/ΩLINE/Ω米国株/Ωケイタ式/Ωインスタ）
+STEP2: 各ProjectにInstructionsをコピペ（~/Desktop/AI経営本部/Projects移行/○○_Instructions.txt）
+STEP3: 各ProjectにKnowledgeを追加（マスターマップ・STYLE_RULES等）
+STEP4: MemoryにAI経営本部の基本情報を追記
+STEP5: 以後、引き継ぎ書コピペ不要。Projectを開くだけで即作業開始。
+Desktop・GitHub・LaunchAgentは一切変更なし。
