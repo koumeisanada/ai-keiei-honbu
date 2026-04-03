@@ -59,13 +59,13 @@ echo ""
 echo "$DEFAULT_THEME" > "$THEME_FILE"
 
 echo "【前日の品質チェック結果を反映中...】"
-python3 ~/Desktop/AI経営本部/API連携/Gemini/apply_feedback.py
+python3 ~/Desktop/AI経営本部/API連携/Gemini/apply_feedback.py || echo '⚠️ スキップして続行'
 echo "✅ 前日のフィードバック反映完了"
 echo ""
 
 echo "【Step1】メルマガを生成中...（Gemini使用）"
 for i in 1 2 3; do
-  python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_merumaga.py "$THEME" > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt
+  python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_merumaga.py "$THEME" > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt || echo '⚠️ スキップして続行'
   if [ -s ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt ]; then
     break
   fi
@@ -80,17 +80,17 @@ echo "✅ メルマガ完了"
 echo ""
 
 echo "AI最新情報を収集中..."
-python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_ai_news.py
+python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_ai_news.py || echo '⚠️ スキップして続行'
 echo "✅ AI最新情報収集完了"
 echo ""
 
 echo "【Step2】LINE4日分を生成中...（Gemini使用）"
-python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_line_4days.py ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/LINE4日分.txt
+python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_line_4days.py ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/LINE4日分.txt || echo '⚠️ スキップして続行'
 echo "✅ LINE4日分完了"
 echo ""
 
 echo "【Step3】リール動画原稿を生成中...（Gemini使用）"
-python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_reel.py ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/リール動画原稿.txt
+python3 ~/Desktop/AI経営本部/API連携/Gemini/generate_reel.py ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/メルマガ.txt > ~/Desktop/AI経営本部/集客販売/日次成果物/$DATE/リール動画原稿.txt || echo '⚠️ スキップして続行'
 echo "✅ リール動画原稿完了"
 echo ""
 
@@ -102,7 +102,7 @@ echo ""
 echo "【競合分析実行中...（週1回）】"
 DAY_OF_WEEK=$(date +%u)
 if [ "$DAY_OF_WEEK" = "1" ]; then
-    python3 ~/Desktop/AI経営本部/競合調査/ai_competitor_research.py
+    python3 ~/Desktop/AI経営本部/競合調査/ai_competitor_research.py || echo '⚠️ スキップして続行'
     echo "✅ 競合分析完了"
 else
     echo "（競合分析は毎週月曜日に自動実行）"
@@ -111,23 +111,23 @@ echo ""
 
 echo "【セールスレター制作 本日のタスク実行中...】"
 echo "午前・午後の2回実行します"
-python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/daily_salesletter.py
+python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/daily_salesletter.py || echo '⚠️ スキップして続行'
 echo "✅ セールスレタータスク完了"
 echo ""
 
 echo "【グローバルAI講座調査実行中...】"
-python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/global_ai_research.py
+python3 ~/Desktop/AI経営本部/AI活用講義/セールスレター制作/global_ai_research.py || echo '⚠️ スキップして続行'
 echo "✅ グローバル調査完了"
 echo ""
 
 echo "ケイタ式 eBayリサーチ実行中..."
-python3 ~/Desktop/AI経営本部/物販ビジネス/ケイタ式/自動化スクリプト/ebay_japan_research.py
+python3 ~/Desktop/AI経営本部/物販ビジネス/ケイタ式/自動化スクリプト/ebay_japan_research.py || echo '⚠️ スキップして続行'
 echo "✅ ケイタ式 eBayリサーチ完了"
 echo ""
 
 echo "【米国企業リサーチ実行中...（Gemini使用）】"
 echo "米国企業リサーチ開始..."
-python3 ~/Desktop/AI経営本部/API連携/daily_stock_research.py
+python3 ~/Desktop/AI経営本部/API連携/daily_stock_research.py || echo '⚠️ スキップして続行'
 echo "✅ 米国企業リサーチ完了"
 echo ""
 
@@ -163,4 +163,4 @@ sed -i '' "s/# 最終更新：.*/# 最終更新：$(date '+%Y年%m月%d日')/" ~
 echo "✅ 引き継ぎマスター更新完了"
 
 # LINEステップメール連動型メルマガ生成
-python3 ~/Desktop/AI経営本部/API連携/generate_merumaga_from_line.py
+python3 ~/Desktop/AI経営本部/API連携/generate_merumaga_from_line.py || echo '⚠️ スキップして続行'
