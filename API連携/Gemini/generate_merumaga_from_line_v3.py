@@ -126,31 +126,46 @@ def expand_to_merumaga(line_content, file_code):
 - 結論: 900〜1,000文字
 - 合計: 3,600〜4,000文字
 
-【出力フォーマット】
+【出力の絶対ルール】
+- 「序論:」「本論:」「結論:」「件名:」「文字数:」等のラベルは一切入れない
+- 「━━━以下フッター━━━」のような設定文字は入れない
+- 署名「真田孔明」は末尾に1回のみ
+- 読者がそのまま受け取るメルマガ本文そのものを出力する
+- 「。」で終わる一文の後は必ず改行を入れる
+- ◯小見出しの後は必ず空行1つを入れてから本文を始める
+
+【出力フォーマット（この通りに出力すること）】
 ◇メールタイトル
 
 
-◯序論の小見出し
-（序論本文 900〜999字）
+◯小見出し1
+
+本文を段落ごとに改行して書く。
+
+「。」の後は必ず改行する。
+
+段落は2〜4行で区切る。
 
 
 
 
-◯本論1の小見出し
-（本論1本文 900〜999字）
+◯小見出し2
+
+本文。
 
 
 
 
-◯本論2の小見出し
-（本論2本文 900〜999字）
+◯小見出し3
+
+本文。
 
 
 
 
-◯結論の小見出し
-（結論本文 900〜999字）
+◯小見出し4
 
+本文。
 
 　　　　　　　　　真田孔明
 
@@ -179,11 +194,65 @@ def main():
         return
     print(f"{file_code} 読み込み完了")
     merumaga_content = expand_to_merumaga(line_content, file_code)
+
+    # === 自動修正 ===
+    import re
+    # NGワード修正
+    for old, new in [("私は", "僕は"), ("私の", "僕の"), ("私が", "僕が"), ("私自身", "僕自身"), ("私も", "僕も")]:
+        merumaga_content = merumaga_content.replace(old, new)
+    for ng in ["皆さん", "皆様", "みなさん"]:
+        merumaga_content = merumaga_content.replace(ng, "あなた")
+    merumaga_content = merumaga_content.replace("心筋梗塞", "突然の病")
+    # 三人称修正（タイトル行・署名行は除外）
+    lines = merumaga_content.split("\n")
+    fixed_lines = []
+    for line in lines:
+        if line.startswith("◇") or "　　　　" in line or "━━" in line:
+            fixed_lines.append(line)
+        else:
+            line = line.replace("真田孔明が", "僕が").replace("真田孔明は", "僕は").replace("真田孔明の", "僕の")
+            fixed_lines.append(line)
+    merumaga_content = "\n".join(fixed_lines)
+    # ラベル除去
+    merumaga_content = merumaga_content.replace("━━━以下フッター━━━", "")
+    for label in ["序論:", "序論：", "本論①:", "本論①：", "本論②:", "本論②：", "本論1:", "本論1：", "本論2:", "本論2：", "結論:", "結論：", "件名:", "件名："]:
+        merumaga_content = merumaga_content.replace(label, "")
+    # 重複署名の除去（最初の署名〜末尾を切り、正しいフッターを再付与）
+    sig_marker = "　　　　　　　　　真田孔明"
+    if merumaga_content.count(sig_marker) > 1:
+        idx = merumaga_content.index(sig_marker)
+        merumaga_content = merumaga_content[:idx].rstrip("\n")
+    elif merumaga_content.count(sig_marker) == 1:
+        idx = merumaga_content.index(sig_marker)
+        merumaga_content = merumaga_content[:idx].rstrip("\n")
+    # フッターがなければ追加
+    FOOTER = "\n\n　　　　　　　　　真田孔明\n\n\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n『レベルファイブAI経営マスタリー』\nhttps://koumeisanada.github.io/ai-keiei-honbu/\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+    merumaga_content = merumaga_content + FOOTER
+    # 「。」後の改行確保
+    merumaga_content = re.sub(r'。([^\n」）\s])', '。\n\n\\1', merumaga_content)
+    # ◯後の改行確保
+    merumaga_content = re.sub(r'(◯[^\n]+)\n([^\n])', r'\1\n\n\2', merumaga_content)
+
+    # === 保存 ===
     today = datetime.now().strftime("%Y%m%d")
     output_file = f"{OUTPUT_DIR}/メルマガ_{today}_{file_code}.txt"
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(merumaga_content)
+
+    # === 自動チェック ===
+    errors = []
+    if not merumaga_content.startswith("◇"):
+        errors.append("◇タイトルが1行目にない")
+    if merumaga_content.count("◯") < 4:
+        errors.append("◯小見出しが4個未満({})".format(merumaga_content.count("◯")))
+    if merumaga_content.count(sig_marker) != 1:
+        errors.append("署名が1個でない({})".format(merumaga_content.count(sig_marker)))
+    for ng in ["心筋梗塞", "マーケティングセンス", "皆さん", "皆様", "━━━以下"]:
+        if ng in merumaga_content:
+            errors.append("NGワード残存:{}".format(ng))
+    if errors:
+        print("品質チェック警告: {}".format(", ".join(errors)))
     phase_code, max_talks = PHASES[counter["phase_index"]]
     counter["talk_number"] += 1
     counter["total_count"] += 1
